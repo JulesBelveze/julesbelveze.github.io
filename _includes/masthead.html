@@ -1,0 +1,21 @@
+<header class="masthead" role="banner">
+  <div class="masthead__inner-wrap">
+    <div class="wrapper masthead__branding">
+      <a class="site-title" rel="author" href="{{ '/' | relative_url }}">
+        {% assign logo_path = site.logo | default: site.favicon | default: '/assets/images/favicon.svg' %}
+        <img class="site-logo" src="{{ logo_path | relative_url }}" alt="" aria-hidden="true"/>
+        {{ site.title }}
+      </a>
+
+      {% if site.data.navigation.main %}
+      <nav aria-label="Primary Navigation">
+        <ul class="masthead__menu">
+          {% for link in site.data.navigation.main %}
+            <li><a href="{{ link.url | relative_url }}">{{ link.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+</header>
