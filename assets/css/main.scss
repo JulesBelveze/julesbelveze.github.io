@@ -55,6 +55,10 @@ ul {
 .site-logo { width: 20px; height: 20px; display: inline-block; border-radius: 4px; }
 .masthead__menu { list-style: none; margin: 0; padding: 0; display: inline-flex; gap: 1rem; }
 
+// Home title with logo
+.home-title { display: flex; align-items: center; gap: .5rem; margin: 0 0 .5rem 0; font-size: 2rem; }
+.home-title__logo { width: 28px; height: 28px; border-radius: 6px; }
+
 // Tag filter styles (simple). Active has no border.
 .tag-filter { display: flex; flex-wrap: wrap; gap: .5rem; margin: .5rem 0 1rem; }
 .tag-chip {

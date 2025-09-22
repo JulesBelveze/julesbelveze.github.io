@@ -1,9 +1,18 @@
 ---
 layout: single
-title: Jules
+title: ""
 ---
 
-Welcome — this is a very small, static blog. Recent posts appear below.
+<h1 class="home-title">
+  <img class="home-title__logo" src="{{ site.logo | default: site.favicon | relative_url }}" alt="" aria-hidden="true">
+  Jules
+</h1>
+
+The gloves are off, time for real-world AI.
+
+I’m Jules: curious engineer, code shipper, and clothes lover. If you're after straight talk, sharp insights, and hands-on lessons from the AI frontline, you're in the right place.
+
+Scroll on and let’s build something smarter.
 
 ## External resources
 
