@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Build (prod) then run basic HTML checks without hitting external links
+JEKYLL_ENV=production bundle exec jekyll build --config _config.yml,_config.production.yml
+
+if bundle show html-proofer >/dev/null 2>&1; then
+  bundle exec htmlproofer ./_site \
+    --check-html \
+    --assume-extension \
+    --disable-external
+  echo "HTML checks passed."
+else
+  echo "html-proofer not installed. Run: bundle add html-proofer --group 'test'"
+fi

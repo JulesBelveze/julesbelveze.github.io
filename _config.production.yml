@@ -1,0 +1,18 @@
+############################################################
+# Production config overrides
+#
+# Use with: JEKYLL_ENV=production bundle exec jekyll build \
+#             --config _config.yml,_config.production.yml
+############################################################
+
+# Set your production URL and optional baseurl.
+# Replace with your real domain before deploying.
+url: https://example.com
+baseurl: ""  # e.g., "/blog" for project pages, or "" for root
+
+# Production Sass output should be compressed
+sass:
+  style: compressed
+
+# Any other production-specific overrides can go here.
+# For example, enable any prod-only flags or analytics.

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Build the site with production settings.
+JEKYLL_ENV=production bundle exec jekyll build --config _config.yml,_config.production.yml "$@"
+
+echo "Build complete. Output in _site/"
