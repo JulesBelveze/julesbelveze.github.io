@@ -16,7 +16,7 @@ plugins:
 
 # Production URL settings
 # Using a user/organization GitHub Pages site
-url: https://jbelveze.github.io
+url: https://julesbelveze.github.io
 baseurl: ""
 
 # Theme options
