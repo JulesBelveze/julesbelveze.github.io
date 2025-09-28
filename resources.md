@@ -4,14 +4,6 @@ title: Resources
 permalink: /resources/
 ---
 
-Curated external links and references.
-
-{% include resources-list.html %}
-
-The curated links above are external references I did not author. Use the filter below to browse my own posts and papers.
-
-## Filter by Tag
-
 <div class="tag-filter">
   <button class="tag-chip is-active" data-tag="all">All</button>
   {% for pair in site.tags %}

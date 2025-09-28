@@ -17,9 +17,9 @@ repository mostly around NLP and how to speed-up Transformer based models.
 
 Scroll on and let's connect if there's anything you want to talk about!
 
-## External resources
+[//]: # (## External resources)
 
-{% include resources-list.html %}
+{% include_cached resources-list.html %}
 
 ## Recent Posts
 
