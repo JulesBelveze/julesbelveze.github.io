@@ -5,13 +5,15 @@ Local preview
 1) Install Ruby (e.g., via rbenv or asdf). Ruby 3.x is fine.
 2) Install Bundler: `gem install bundler` (if not present).
 3) Install deps: `bundle install`
-4) Serve locally: `bundle exec jekyll serve --livereload`
+4) Serve locally: `script/serve`
 5) Open http://127.0.0.1:4000
 
 Notes
 - This uses the `github-pages` gem to match GitHub Pages’ environment.
 - Posts live in `_posts/`. Home page is `index.md`.
 - Update site config in `_config.yml`.
+- Use `JEKYLL_ENV=production` for production builds. We provide `script/build` which applies `_config.production.yml`.
+- `_site/` is ignored; don’t commit build output.
 
 Theme and structure
 - Theme: Minimal Mistakes via `remote_theme: mmistakes/minimal-mistakes`. Skin is set with `minimal_mistakes_skin` in `_config.yml`.
@@ -22,6 +24,22 @@ Theme and structure
 - Assets: `assets/css/main.scss` imports Minimal Mistakes (skin + core). Add custom CSS below imports.
 - SEO/sitemap: `jekyll-seo-tag` and `jekyll-sitemap` enabled; set `url`/`baseurl` for correct canonical and sitemap URLs.
 - Housekeeping: `404.html` and `robots.txt` included.
+
+Production build
+
+- Set your production site URL in `_config.production.yml` (`url` and `baseurl`).
+- Build locally: `script/build` (outputs to `_site/`).
+- robots: indexing is allowed only when `JEKYLL_ENV=production`.
+- Optional link checks: `script/check` (uses `html-proofer`, external links disabled by default).
+
+GitHub Pages deployment
+
+- A workflow is provided at `.github/workflows/jekyll.yml` to build and deploy to GitHub Pages.
+- Enable Pages in your repository settings and set the source to “GitHub Actions”.
+- For a user/organization site, set:
+  - `_config.production.yml`: `url: https://<username>.github.io`, `baseurl: ""`
+- For a project site, set:
+  - `_config.production.yml`: `url: https://<username>.github.io`, `baseurl: "/<repo>"`
 
 Favicon
 - Put your favicon image at `assets/images/favicon.png` (PNG recommended), or set a custom path via `favicon` in `_config.yml`.

@@ -8,11 +8,14 @@ title: ""
   Jules
 </h1>
 
-The gloves are off, time for real-world AI.
+I’m Jules, currently working as a Software Engineer @[Dust](https://dust.tt).
 
-I’m Jules: curious engineer, code shipper, and clothes lover. If you're after straight talk, sharp insights, and hands-on lessons from the AI frontline, you're in the right place.
+I previously worked as a researcher at Microsoft, on anomaly detection in high dimensional time series. Then fell in
+love with all things Transformers and developed to NLP pipeline at [Hypefactors](https://hypefactors.com/). We dealt
+with ~1B inferences/day on multi-lingual problems like NER and reputation analysis. As a side gig I worked on a few OSS
+repository mostly around NLP and how to speed-up Transformer based models.
 
-Scroll on and let’s build something smarter.
+Scroll on and let's connect if there's anything you want to talk about!
 
 ## External resources
 

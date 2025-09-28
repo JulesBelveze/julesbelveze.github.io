@@ -1,4 +1,10 @@
+{% if jekyll.environment == "production" %}
 User-agent: *
 Allow: /
 
 Sitemap: {{ site.url }}{{ site.baseurl }}/sitemap.xml
+{% else %}
+# Disallow indexing in non-production builds
+User-agent: *
+Disallow: /
+{% endif %}

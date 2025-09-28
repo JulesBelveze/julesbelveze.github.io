@@ -1,6 +1,8 @@
 # Site settings
 title: Jules Belveze
 description: "Thoughts, notes, and links."
+lang: en
+locale: en
 
 # Use GitHub Pages-supported theme
 remote_theme: mmistakes/minimal-mistakes
@@ -12,9 +14,10 @@ plugins:
   - jekyll-sitemap
   - jekyll-include-cache
 
-# When you know your domain, uncomment and set these
-# url: https://yourusername.github.io
-# baseurl: "" # keep empty for user/organization site
+# Production URL settings
+# Using a user/organization GitHub Pages site
+url: https://jbelveze.github.io
+baseurl: ""
 
 # Theme options
 minimal_mistakes_skin: "dirt" # e.g., default, air, aqua, contrast, dark, dirt, neon, mint, midnight, sunrise
@@ -22,6 +25,19 @@ minimal_mistakes_skin: "dirt" # e.g., default, air, aqua, contrast, dark, dirt, 
 # Build and content structure
 permalink: /:categories/:title/
 timezone: UTC
+
+# Markdown and syntax highlighting
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter: rouge
+  smart_quotes: lsquo,rsquo,ldquo,rdquo
+
+# Sass/SCSS processing (overridden to compressed in production)
+sass:
+  style: expanded
 
 defaults:
   - scope:
@@ -44,6 +60,7 @@ exclude:
   - Gemfile.lock
   - .gitignore
   - .DS_Store
+  - _site
 
 # Minima options
 show_excerpts: true
@@ -54,6 +71,10 @@ social:
   github: "https://github.com/JulesBelveze"
   x: "JulesBelveze"
   linkedin: "https://www.linkedin.com/in/jules-belveze/"
+
+# Optional: extra hints for jekyll-seo-tag
+twitter_username: JulesBelveze
+github_username: JulesBelveze
 
 # Favicon image path (relative or absolute). Default uses an SVG placeholder.
 favicon: /assets/images/logo.png

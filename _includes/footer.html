@@ -1,3 +1,4 @@
+{% cache footer %}
 <footer class="page__footer">
   <div class="wrapper">
     {% assign gh = site.social.github | default: '' | strip %}
@@ -34,3 +35,4 @@
     <p class="copyright">© {{ site.time | date: '%Y' }} {{ site.title }}</p>
   </div>
 </footer>
+{% endcache %}
