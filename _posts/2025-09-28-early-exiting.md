@@ -11,8 +11,8 @@ they do for complex reasoning problems. It's like using a Formula 1 car for both
 
 ## One Size Fits All
 
-The current compression toolkit available is impressive. The three most commonly used approaches each exploit
-different forms of redundancy:
+Don't get me wrong, the current compression toolkit available is impressive. The three most commonly used approaches
+each exploit different forms of redundancy:
 
 - **Quantization** reduces numerical precision. Drop from FP32 to INT8 and you get predictable speedups—every input
   benefits equally from reduced precision arithmetic. The bet: neural networks don't need 32-bit precision for most
@@ -119,11 +119,11 @@ speculative execution revolutionized CPUs, adaptive computation will transform n
 whether but when the tooling catches up.
 
 Early exiting points toward systems that think more efficiently—not just faster, but smarter about resource allocation.
-Because using the same computation for "2 + 2" and complex reasoning isn't just inefficient. It suggests our systems
+Because using the same computation for _"2 + 2"_ and complex reasoning isn't just inefficient. It suggests our systems
 lack a basic form of intelligence: knowing when to think and when to act.
 
 ---
 
-*In upcoming posts, we'll dive deep into specific approaches like DeeBERT, BERxiT, and LayerSkip, exploring how
-different research groups have solved the training and inference challenges of early exiting.*
+*In follow-up posts, we'll dive deep into specific approaches like DeeBERT, BERxiT, and LayerSkip, exploring how
+different researchers have solved the training and inference challenges of early exiting.*
 

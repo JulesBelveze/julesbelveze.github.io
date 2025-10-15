@@ -26,6 +26,9 @@ minimal_mistakes_skin: "dirt" # e.g., default, air, aqua, contrast, dark, dirt, 
 permalink: /:categories/:title/
 timezone: UTC
 
+# Enable math rendering site-wide
+mathjax: true
+
 # Markdown and syntax highlighting
 markdown: kramdown
 highlighter: rouge
@@ -34,6 +37,7 @@ kramdown:
   hard_wrap: false
   syntax_highlighter: rouge
   smart_quotes: lsquo,rsquo,ldquo,rdquo
+  math_engine: mathjax
 
 # Sass/SCSS processing (overridden to compressed in production)
 sass:

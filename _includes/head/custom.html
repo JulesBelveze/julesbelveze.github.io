@@ -12,3 +12,32 @@ Adds favicon links. Place your image at `assets/images/favicon.png` or set
   <link rel="shortcut icon" type="image/png" href="{{ favicon_path | relative_url }}">
   <link rel="apple-touch-icon" href="{{ favicon_path | relative_url }}">
 {% endif %}
+
+{%- comment -%}
+Site-wide MathJax v3. Ensures LaTeX renders even if the theme
+doesn’t auto-include scripts based on config flags.
+Supports inline `$...$` or `\(...\)` and display `$$...$$` or `\[...\]`.
+{%- endcomment -%}
+{% raw %}
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true
+    },
+    options: {
+      skipHtmlTags: ['script','noscript','style','textarea','pre','code'],
+      ignoreHtmlClass: 'tex2jax_ignore',
+      processHtmlClass: 'tex2jax_process'
+    }
+  };
+  // Defer loading to avoid blocking rendering
+  (function(){
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js';
+    document.head.appendChild(s);
+  })();
+</script>
+{% endraw %}
