@@ -4,9 +4,6 @@ tags: [ blog, inference ]
 mathjax: true
 ---
 
-LayerSkip: early exiting grows up for LLMs
-==========================================
-
 Why do decoder-only language models still run every token through every layer?
 
 In the first post of this series, we looked at early exiting as an underused compression trick. The core idea was simple: easy inputs should not pay the same computational price as hard ones. We then dug into DeeBERT, which showed how to bolt exits onto BERT without redesigning the model. BERxiT pushed the idea further, fixing entropy-based confidence and lifting the "classification only" ceiling.
