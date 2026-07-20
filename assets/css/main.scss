@@ -12,7 +12,9 @@
   --cafe-surface-raised: #f8faf8;
   --cafe-text: #172522;
   --cafe-muted: #52635f;
+  --cafe-meta: #4a6b6b;
   --cafe-border: #bfcfca;
+  --cafe-divider: #c8d8d8;
   --cafe-accent: #0c6b5c;
   --cafe-focus: #9b4f1a;
   --cafe-on-primary: #f8faf8;
@@ -138,11 +140,14 @@ h6,
   font-weight: 600;
   padding: 10px 14px;
   text-decoration: none;
+  transition: background-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
 }
 
 .masthead__menu a:hover,
+.masthead__menu a:focus-visible,
 .masthead__menu a[aria-current="page"] {
   background: var(--cafe-secondary);
+  box-shadow: inset 0 -2px 0 var(--cafe-primary);
   color: var(--cafe-primary-strong);
 }
 
@@ -169,7 +174,7 @@ h6,
 }
 
 .home-hero {
-  border-bottom: 2px solid var(--cafe-primary);
+  border-bottom: 1px solid var(--cafe-divider);
   margin-bottom: var(--cafe-space-48);
   padding: clamp(3rem, 9vw, 7rem) 0 var(--cafe-space-48);
 }
@@ -190,7 +195,7 @@ h6,
   display: flex;
   font-size: clamp(2.8rem, 8vw, 6.2rem);
   gap: var(--cafe-space-16);
-  letter-spacing: -.07em;
+  letter-spacing: .025em;
   line-height: 1;
   margin: 0 0 var(--cafe-space-24);
 }
@@ -246,7 +251,7 @@ h6,
 
 .button--secondary {
   background: transparent;
-  border-color: var(--cafe-border);
+  border-color: var(--cafe-primary-strong);
   color: var(--cafe-primary-strong);
 }
 
@@ -266,7 +271,7 @@ h6,
 
 .compute-receipt li {
   display: grid;
-  gap: var(--cafe-space-4);
+  gap: var(--cafe-space-8);
   max-width: none;
 }
 
@@ -296,7 +301,7 @@ h6,
 }
 
 .post-card {
-  background: transparent;
+  background: var(--cafe-surface-raised);
   border: 1px solid var(--cafe-border);
   border-radius: var(--cafe-radius);
   border-left: 4px solid var(--cafe-border);
@@ -316,18 +321,24 @@ h6,
   align-items: center;
   display: flex;
   flex-wrap: wrap;
+  color: var(--cafe-meta);
+  font-weight: 500;
   gap: var(--cafe-space-8);
 }
 
-.post-card__meta span::before {
-  content: "•";
-  margin-right: var(--cafe-space-8);
+.post-card__meta span {
+  background: var(--cafe-secondary);
+  border-radius: 4px;
+  color: var(--cafe-primary-strong);
+  padding: var(--cafe-space-2) var(--cafe-space-8);
 }
 
 .post-card__title {
+  font-family: "Poppins", sans-serif;
   font-size: clamp(1.2rem, 2vw, 1.5rem);
+  font-weight: 600;
   line-height: 1.25;
-  margin: 0 0 var(--cafe-space-8);
+  margin: 0 0 var(--cafe-space-12);
 }
 
 .post-card__title a {
@@ -414,6 +425,7 @@ h6,
 
 .page__footer .social-links a {
   align-items: center;
+  background: rgba(248, 250, 248, .12);
   border: 1px solid rgba(248, 250, 248, .35);
   border-radius: var(--cafe-radius);
   color: var(--cafe-on-primary);
@@ -437,7 +449,7 @@ h6,
 }
 
 .page__footer .copyright {
-  font-size: .8rem;
+  font-size: .875rem;
   margin: 0;
 }
 
