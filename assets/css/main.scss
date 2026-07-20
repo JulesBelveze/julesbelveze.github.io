@@ -191,10 +191,11 @@ h6,
 }
 
 .home-title {
-  align-items: center;
-  display: flex;
-  font-size: clamp(2.8rem, 8vw, 6.2rem);
+  align-items: start;
+  display: grid;
+  font-size: clamp(2.4rem, 5vw, 4.5rem);
   gap: var(--cafe-space-16);
+  grid-template-columns: auto minmax(0, 1fr);
   letter-spacing: .025em;
   line-height: 1;
   margin: 0 0 var(--cafe-space-24);
@@ -205,6 +206,10 @@ h6,
   border-radius: var(--cafe-radius);
   height: clamp(3rem, 7vw, 5rem);
   width: clamp(3rem, 7vw, 5rem);
+}
+
+.home-title__logo + span {
+  min-width: 0;
 }
 
 .home-hero__copy {
@@ -506,8 +511,7 @@ h6,
   }
 
   .home-title {
-    align-items: flex-start;
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .compute-receipt {

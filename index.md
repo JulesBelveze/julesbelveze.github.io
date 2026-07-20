@@ -7,7 +7,7 @@ title: ""
   <p class="eyebrow">ML systems engineer · writer</p>
   <h1 class="home-title">
     <img class="home-title__logo" src="{{ site.logo | default: site.favicon | relative_url }}" alt="" aria-hidden="true" width="80" height="80" fetchpriority="high">
-    Make machine learning earn its compute.
+    <span>Make machine learning earn its compute.</span>
   </h1>
 
   <div class="home-hero__copy">
