@@ -4,7 +4,7 @@ This is a Jekyll site using the Minimal Mistakes theme and the GitHub Pages gem.
 
 ## Setup
 
-Install a Ruby version manager that reads `.ruby-version`, then install Ruby 3.2.2. `mise`, `asdf`, and `rbenv` all work.
+Install a Ruby version manager that reads `.ruby-version`, then install Ruby 3.2.6. `mise`, `asdf`, and `rbenv` all work.
 
 Run the setup script from the repository root:
 
