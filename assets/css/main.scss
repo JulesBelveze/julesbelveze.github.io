@@ -5,20 +5,21 @@
 @import "minimal-mistakes";
 
 :root {
-  --cafe-primary: #0c6b5c;
-  --cafe-primary-strong: #064b41;
-  --cafe-secondary: #d9e4e0;
-  --cafe-surface: #e7ecea;
-  --cafe-surface-raised: #f8faf8;
-  --cafe-text: #172522;
-  --cafe-muted: #52635f;
-  --cafe-meta: #4a6b6b;
-  --cafe-border: #bfcfca;
-  --cafe-divider: #c8d8d8;
-  --cafe-accent: #0c6b5c;
-  --cafe-focus: #9b4f1a;
+  --cafe-primary: #ff5100;
+  --cafe-primary-strong: #111111;
+  --cafe-link: #c94300;
+  --cafe-secondary: #e7e5df;
+  --cafe-surface: #f4f4f1;
+  --cafe-surface-raised: #ffffff;
+  --cafe-text: #111111;
+  --cafe-muted: #62625f;
+  --cafe-meta: #72726e;
+  --cafe-border: #d4d2ca;
+  --cafe-divider: #dfddd5;
+  --cafe-accent: #ff5100;
+  --cafe-focus: #ff5100;
   --cafe-on-primary: #fff;
-  --cafe-shadow: 0 12px 30px rgba(23, 37, 34, .08);
+  --cafe-shadow: 0 12px 30px rgba(17, 17, 17, .08);
   --cafe-radius: 6px;
   --cafe-space-2: 2px;
   --cafe-space-4: 4px;
@@ -49,8 +50,8 @@ body {
 }
 
 a {
-  color: var(--cafe-primary);
-  text-decoration-color: rgba(12, 107, 92, .35);
+  color: var(--cafe-link);
+  text-decoration-color: rgba(255, 81, 0, .35);
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
@@ -88,9 +89,9 @@ h6,
 }
 
 .masthead {
-  background: rgba(231, 236, 234, .94);
+  background: rgba(244, 244, 241, .94);
   border-bottom: 1px solid var(--cafe-border);
-  box-shadow: 0 4px 20px rgba(23, 37, 34, .04);
+  box-shadow: 0 4px 20px rgba(17, 17, 17, .04);
   position: sticky;
   top: 0;
   z-index: 20;
@@ -431,8 +432,8 @@ h6,
 
 .page__footer .social-links a {
   align-items: center;
-  background: rgba(248, 250, 248, .12);
-  border: 1px solid rgba(248, 250, 248, .35);
+  background: rgba(255, 255, 255, .12);
+  border: 1px solid rgba(255, 255, 255, .35);
   border-radius: var(--cafe-radius);
   color: var(--cafe-on-primary);
   display: inline-flex;
