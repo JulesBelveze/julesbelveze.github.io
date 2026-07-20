@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+required_ruby="$(tr -d '[:space:]' < .ruby-version)"
+current_ruby="$(ruby -e 'print RUBY_VERSION')"
+
+if [[ "$current_ruby" != "$required_ruby" ]]; then
+  echo "Ruby $required_ruby is required; found $current_ruby." >&2
+  echo "Install the version in .ruby-version with mise, asdf, or rbenv, then run this script again." >&2
+  exit 1
+fi
+
+bundler_version="$(awk '/^BUNDLED WITH$/ { getline; gsub(/^[[:space:]]+/, ""); print; exit }' Gemfile.lock)"
+gem install bundler --version "$bundler_version"
+bundle install
