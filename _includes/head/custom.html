@@ -1,10 +1,12 @@
 {% comment %}
 Custom head includes. Minimal Mistakes auto-includes this file if present.
-Adds favicon links. Place your image at `assets/images/favicon.png` or set
-`favicon` in `_config.yml` to a custom path.
+Set `favicon` in `_config.yml` to a custom path.
 {% endcomment %}
 
 {% assign favicon_path = site.favicon | default: '/assets/images/favicon.svg' %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 {% if favicon_path contains '.svg' %}
   <link rel="icon" type="image/svg+xml" href="{{ favicon_path | relative_url }}">
 {% else %}

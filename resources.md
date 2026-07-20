@@ -4,26 +4,19 @@ title: Resources
 permalink: /resources/
 ---
 
+<p class="page-intro">Browse the writing by topic. Select a tag to narrow the list.</p>
+
 <div class="tag-filter">
-  <button class="tag-chip is-active" data-tag="all">All</button>
+  <button class="tag-chip is-active" type="button" data-tag="all" aria-pressed="true">All</button>
   {% for pair in site.tags %}
     {% assign name = pair[0] %}
-    <button class="tag-chip" data-tag="{{ name | escape }}">{{ name }}</button>
+    <button class="tag-chip" type="button" data-tag="{{ name | escape }}" aria-pressed="false">{{ name }}</button>
   {% endfor %}
-  </div>
+</div>
 
 <ul id="filter-posts" class="post-cards">
 {% for post in site.posts %}
-  <li class="post-card" data-tags="{% for t in post.tags %}{{ t }}{% unless forloop.last %},{% endunless %}{% endfor %}">
-    <div style="margin: 0 0 .25rem 0; font-weight: 600;">
-      {% if post.link %}
-        <a href="{{ post.link }}" target="_blank" rel="noopener">{{ post.title }}</a>
-      {% else %}
-        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-      {% endif %}
-    </div>
-    <div class="post-excerpt" style="margin: 0 0 .75rem 0;">{{ post.excerpt | markdownify }}</div>
-  </li>
+  {% include post-card.html post=post filterable=true %}
 {% endfor %}
 </ul>
 

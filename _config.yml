@@ -80,9 +80,8 @@ social:
 twitter_username: JulesBelveze
 github_username: JulesBelveze
 
-# Favicon image path (relative or absolute). Default uses an SVG placeholder.
-favicon: /assets/images/logo.png
+# Favicon image path.
+favicon: /assets/images/frame-shift-light.svg
 
-# Optional logo (used next to the site title in the header and on the home page icon).
-# Replace with your PNG/SVG path to your avatar/icon.
-logo: /assets/images/logo.png
+# Site logo.
+logo: /assets/images/frame-shift-light.svg

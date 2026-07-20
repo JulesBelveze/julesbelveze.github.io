@@ -1,57 +1,41 @@
-# Minimal Jekyll Blog
+# Jules Belveze
 
-Local preview
+This is a Jekyll site using the Minimal Mistakes theme and the GitHub Pages gem.
 
-1) Install Ruby (e.g., via rbenv or asdf). Ruby 3.x is fine.
-2) Install Bundler: `gem install bundler` (if not present).
-3) Install deps: `bundle install`
-4) Serve locally: `script/serve`
-5) Open http://127.0.0.1:4000
+## Setup
 
-Notes
-- This uses the `github-pages` gem to match GitHub Pages’ environment.
-- Posts live in `_posts/`. Home page is `index.md`.
-- Update site config in `_config.yml`.
-- Use `JEKYLL_ENV=production` for production builds. We provide `script/build` which applies `_config.production.yml`.
-- `_site/` is ignored; don’t commit build output.
+Install a Ruby version manager that reads `.ruby-version`, then install Ruby 3.2.2. `mise`, `asdf`, and `rbenv` all work.
 
-Theme and structure
-- Theme: Minimal Mistakes via `remote_theme: mmistakes/minimal-mistakes`. Skin is set with `minimal_mistakes_skin` in `_config.yml`.
-- Navigation: `_data/navigation.yml` defines the top nav (Home, Resources).
-- Content separation: external links live in `_data/links.yml`; rendered via `_includes/resources-list.html` and used by `index.md` and `resources.md`.
-- Pages vs posts: long‑lived content in root `.md` files; dated content in `_posts/` (`YYYY-MM-DD-title.md`).
-- Config defaults: `_config.yml` sets `layout: single` for posts and pages and permalink style.
-- Assets: `assets/css/main.scss` imports Minimal Mistakes (skin + core). Add custom CSS below imports.
-- SEO/sitemap: `jekyll-seo-tag` and `jekyll-sitemap` enabled; set `url`/`baseurl` for correct canonical and sitemap URLs.
-- Housekeeping: `404.html` and `robots.txt` included.
+Run the setup script from the repository root:
 
-Production build
+```sh
+script/setup
+```
 
-- Set your production site URL in `_config.production.yml` (`url` and `baseurl`).
-- Build locally: `script/build` (outputs to `_site/`).
-- robots: indexing is allowed only when `JEKYLL_ENV=production`.
-- Optional link checks: `script/check` (uses `html-proofer`, external links disabled by default).
+It installs the Bundler version locked in `Gemfile.lock` and the project gems.
 
-GitHub Pages deployment
+## Common commands
 
-- A workflow is provided at `.github/workflows/jekyll.yml` to build and deploy to GitHub Pages.
-- Enable Pages in your repository settings and set the source to “GitHub Actions”.
-- For a user/organization site, set:
-  - `_config.production.yml`: `url: https://<username>.github.io`, `baseurl: ""`
-- For a project site, set:
-  - `_config.production.yml`: `url: https://<username>.github.io`, `baseurl: "/<repo>"`
+```sh
+script/serve  # Local preview at http://127.0.0.1:4000
+script/build  # Production build in _site/
+script/check  # Production build plus internal HTML checks
+```
 
-Favicon
-- Put your favicon image at `assets/images/favicon.png` (PNG recommended), or set a custom path via `favicon` in `_config.yml`.
-- The site auto-injects the favicon tags via `_includes/head/custom.html`.
+`script/check` does not request external URLs. Use it before opening a pull request.
 
-Minimal Mistakes tips
-- Use `layout: single` for most pages/posts. Optional front matter: `toc: true`, `classes: wide`, `author_profile: false`.
-- To add a hero/intro on the home page, keep `layout: home` in `index.md` and add content there or use feature rows.
-- For categories/tags archives, we can add Liquid-only archive pages compatible with GitHub Pages if desired.
-- Content separation: external links live in `_data/links.yml`; rendered via `_includes/resources-list.html` and used by `index.md` and `resources.md`.
-- Pages vs posts: long‑lived content in root `.md` files; dated content in `_posts/` (`YYYY-MM-DD-title.md`).
-- Config defaults: `_config.yml` sets `layout` defaults and permalink style; header nav lists `resources.md`.
-- Assets: custom CSS goes in `assets/css/main.scss` (front matter required for Jekyll to process SCSS). Minima can be overridden via variables before `@import "minima"`.
-- SEO/sitemap: `jekyll-seo-tag` and `jekyll-sitemap` are enabled; GitHub Pages supports both.
-- Housekeeping: `404.html` and `robots.txt` included; update `site.url` in `_config.yml` for correct sitemap URL.
+## Content
+
+- Pages are root-level Markdown files. Posts are in `_posts/` and follow `YYYY-MM-DD-title.md`.
+- Posts without `link` are published on `/blog/`. A post with `link` opens the external article instead.
+- Use `title` and `tags` on every post. Add `excerpt` when the automatic excerpt is not suitable.
+- The site defaults posts and pages to `layout: single`. Set `toc: true`, `classes: wide`, or `author_profile: false` in front matter when needed.
+- Navigation is in `_data/navigation.yml`. Optional home-page links belong in `_data/links.yml`.
+
+## Configuration and deployment
+
+Set the public URL and base path in `_config.yml`. For this user site, they are `https://julesbelveze.github.io` and an empty base URL.
+
+GitHub Actions runs `script/check` on pull requests and deploys successful builds from `main`. In the repository settings, set Pages to use GitHub Actions.
+
+The favicon and header logo use `assets/images/frame-shift-light.svg`. Update `favicon` or `logo` in `_config.yml` to use another asset.
