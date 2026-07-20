@@ -26,8 +26,8 @@ minimal_mistakes_skin: "dirt" # e.g., default, air, aqua, contrast, dark, dirt, 
 permalink: /:categories/:title/
 timezone: UTC
 
-# Enable math rendering site-wide
-mathjax: true
+# Posts that use math opt in with `mathjax: true`.
+mathjax: false
 
 # Markdown and syntax highlighting
 markdown: kramdown

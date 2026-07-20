@@ -1,6 +1,7 @@
 ---
 title: "Early Exiting: The Under-Hyped Compression Method"
 tags: [ blog, inference ]
+mathjax: true
 ---
 
 Why are we burning GPU hours to answer "2 + 2 = 4"?
@@ -126,4 +127,3 @@ lack a basic form of intelligence: knowing when to think and when to act.
 
 *In follow-up posts, we'll dive deep into specific approaches like DeeBERT, BERxiT, and LayerSkip, exploring how
 different researchers have solved the training and inference challenges of early exiting.*
-

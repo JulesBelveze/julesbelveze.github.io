@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   var chips = Array.prototype.slice.call(document.querySelectorAll('.tag-chip'));
   var cards = Array.prototype.slice.call(document.querySelectorAll('#filter-posts .post-card'));
+  var status = document.querySelector('#filter-status');
 
   function setActiveChip(chip, tag) {
     var active = chip.dataset.tag === tag;
@@ -14,16 +15,23 @@ document.addEventListener('DOMContentLoaded', function () {
       .map(function (value) { return value.trim(); })
       .filter(Boolean);
 
-    card.hidden = tag !== 'all' && tags.indexOf(tag) === -1;
+    var hidden = tag !== 'all' && tags.indexOf(tag) === -1;
+    card.hidden = hidden;
+    return !hidden;
   }
 
   function apply(tag) {
     chips.forEach(function (chip) {
       setActiveChip(chip, tag);
     });
-    cards.forEach(function (card) {
-      setCardVisibility(card, tag);
+    var visibleCards = cards.filter(function (card) {
+      return setCardVisibility(card, tag);
     });
+
+    if (status) {
+      var label = tag === 'all' ? 'all topics' : tag;
+      status.textContent = 'Showing ' + visibleCards.length + ' posts for ' + label + '.';
+    }
   }
 
   chips.forEach(function (chip) {

@@ -14,6 +14,8 @@ permalink: /resources/
   {% endfor %}
 </div>
 
+<p id="filter-status" class="sr-only" aria-live="polite"></p>
+
 <ul id="filter-posts" class="post-cards">
 {% for post in site.posts %}
   {% include post-card.html post=post filterable=true %}

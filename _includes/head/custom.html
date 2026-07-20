@@ -6,7 +6,8 @@ Set `favicon` in `_config.yml` to a custom path.
 {% assign favicon_path = site.favicon | default: '/assets/images/favicon.svg' %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#E7ECEA">
 {% if favicon_path contains '.svg' %}
   <link rel="icon" type="image/svg+xml" href="{{ favicon_path | relative_url }}">
 {% else %}
@@ -15,10 +16,9 @@ Set `favicon` in `_config.yml` to a custom path.
   <link rel="apple-touch-icon" href="{{ favicon_path | relative_url }}">
 {% endif %}
 
+{% if page.mathjax %}
 {%- comment -%}
-Site-wide MathJax v3. Ensures LaTeX renders even if the theme
-doesn’t auto-include scripts based on config flags.
-Supports inline `$...$` or `\(...\)` and display `$$...$$` or `\[...\]`.
+MathJax v3 for posts that use LaTeX.
 {%- endcomment -%}
 {% raw %}
 <script>
@@ -43,3 +43,4 @@ Supports inline `$...$` or `\(...\)` and display `$$...$$` or `\[...\]`.
   })();
 </script>
 {% endraw %}
+{% endif %}
