@@ -5,7 +5,6 @@ set -euo pipefail
 JEKYLL_ENV=production bundle exec jekyll build --config _config.yml,_config.production.yml
 
 bundle exec htmlproofer ./_site \
-  --assume-extension \
   --disable-external
 
 echo "HTML checks passed."
