@@ -17,7 +17,7 @@
   --cafe-divider: #c8d8d8;
   --cafe-accent: #0c6b5c;
   --cafe-focus: #9b4f1a;
-  --cafe-on-primary: #f8faf8;
+  --cafe-on-primary: #fff;
   --cafe-shadow: 0 12px 30px rgba(23, 37, 34, .08);
   --cafe-radius: 6px;
   --cafe-space-2: 2px;
@@ -193,7 +193,7 @@ h6,
 .home-title {
   align-items: start;
   display: grid;
-  font-size: clamp(2.4rem, 5vw, 4.5rem);
+  font-size: clamp(2.15rem, 3.8vw, 3.75rem);
   gap: var(--cafe-space-16);
   grid-template-columns: auto minmax(0, 1fr);
   letter-spacing: .025em;
@@ -244,12 +244,13 @@ h6,
   transform: translateY(-1px);
 }
 
-.button--primary {
+.page__content a.button--primary,
+.page__content a.button--primary:visited {
   background: var(--cafe-primary);
   color: var(--cafe-on-primary);
 }
 
-.button--primary:hover {
+.page__content a.button--primary:hover {
   background: var(--cafe-primary-strong);
   color: var(--cafe-on-primary);
 }
