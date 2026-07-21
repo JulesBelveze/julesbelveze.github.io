@@ -101,18 +101,16 @@ The defensible advice, stripped of everything unproven: validate your signal bef
 
 ## References
 
-|  |  |
-|---|-----------|
-| [1] | Agrawal, L. A. et al. GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning. arXiv:[2507.19457](https://arxiv.org/abs/2507.19457) (2025). |
-| [2] | Yang, C., Wang, X., Lu, Y., Liu, H., Le, Q. V., Zhou, D. & Chen, X. Large Language Models as Optimizers (OPRO). arXiv:[2309.03409](https://arxiv.org/abs/2309.03409) (2023). |
-| [3] | Wang, Z., Mao, J., Fried, D. & Neubig, G. Agent Workflow Memory. arXiv:[2409.07429](https://arxiv.org/abs/2409.07429) (2024). |
-| [4] | Zhao, A., Huang, D., Xu, Q., Lin, M., Liu, Y.-J. & Huang, G. ExpeL: LLM Agents Are Experiential Learners. AAAI. arXiv:[2308.10144](https://arxiv.org/abs/2308.10144) (2024). |
-| [5] | Hu, S., Lu, C. & Clune, J. Automated Design of Agentic Systems (ADAS). arXiv:[2408.08435](https://arxiv.org/abs/2408.08435) (2024). |
-| [6] | Yin, X., Wang, X., Pan, L., Lin, L., Wan, X. & Wang, W. Y. Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement. ACL. arXiv:[2410.04444](https://arxiv.org/abs/2410.04444) (2024). |
-| [7] | Zhang, J., Hu, S., Lu, C., Lange, R. & Clune, J. Darwin Gödel Machine: Open-Ended Evolution of Self-Improving Agents. arXiv:[2505.22954](https://arxiv.org/abs/2505.22954) (2025). |
-| [8] | Deshpande, D., Gangal, V., Mehta, H., Krishnan, J., Kannappan, A. & Qian, R. TRAIL: Trace Reasoning and Agentic Issue Localization. arXiv:[2505.08638](https://arxiv.org/abs/2505.08638) (2025). |
-| [9] | Gao, L., Schulman, J. & Hilton, J. Scaling Laws for Reward Model Overoptimization. arXiv:[2210.10760](https://arxiv.org/abs/2210.10760) (2022). |
-| [10] | Khattab, O., Singhvi, A., Maheshwari, P., Zhang, Z., Santhanam, K. et al. DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines. arXiv:[2310.03714](https://arxiv.org/abs/2310.03714) (2023). |
-| [11] | Yuan, W., Pang, R. Y., Cho, K., Sukhbaatar, S., Xu, J. & Weston, J. Self-Rewarding Language Models. arXiv:[2401.10020](https://arxiv.org/abs/2401.10020) (2024). |
-| [12] | Bai, Y. et al. Constitutional AI: Harmlessness from AI Feedback. arXiv:[2212.08073](https://arxiv.org/abs/2212.08073) (2022). |
-| [13] | Chen, T. Y., Kuo, F.-C., Liu, H., Poon, P.-L., Towey, D., Tse, T. H. & Zhou, Z. Q. Metamorphic Testing: A Review of Challenges and Opportunities. *ACM Computing Surveys* 51(1), 4:1–4:27. [doi:10.1145/3143561](https://doi.org/10.1145/3143561) (2018). |
+1. Agrawal, L. A. et al. GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning. arXiv:[2507.19457](https://arxiv.org/abs/2507.19457) (2025).
+2. Yang, C., Wang, X., Lu, Y., Liu, H., Le, Q. V., Zhou, D. & Chen, X. Large Language Models as Optimizers (OPRO). arXiv:[2309.03409](https://arxiv.org/abs/2309.03409) (2023).
+3. Wang, Z., Mao, J., Fried, D. & Neubig, G. Agent Workflow Memory. arXiv:[2409.07429](https://arxiv.org/abs/2409.07429) (2024).
+4. Zhao, A., Huang, D., Xu, Q., Lin, M., Liu, Y.-J. & Huang, G. ExpeL: LLM Agents Are Experiential Learners. AAAI. arXiv:[2308.10144](https://arxiv.org/abs/2308.10144) (2024).
+5. Hu, S., Lu, C. & Clune, J. Automated Design of Agentic Systems (ADAS). arXiv:[2408.08435](https://arxiv.org/abs/2408.08435) (2024).
+6. Yin, X., Wang, X., Pan, L., Lin, L., Wan, X. & Wang, W. Y. Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement. ACL. arXiv:[2410.04444](https://arxiv.org/abs/2410.04444) (2024).
+7. Zhang, J., Hu, S., Lu, C., Lange, R. & Clune, J. Darwin Gödel Machine: Open-Ended Evolution of Self-Improving Agents. arXiv:[2505.22954](https://arxiv.org/abs/2505.22954) (2025).
+8. Deshpande, D., Gangal, V., Mehta, H., Krishnan, J., Kannappan, A. & Qian, R. TRAIL: Trace Reasoning and Agentic Issue Localization. arXiv:[2505.08638](https://arxiv.org/abs/2505.08638) (2025).
+9. Gao, L., Schulman, J. & Hilton, J. Scaling Laws for Reward Model Overoptimization. arXiv:[2210.10760](https://arxiv.org/abs/2210.10760) (2022).
+10. Khattab, O., Singhvi, A., Maheshwari, P., Zhang, Z., Santhanam, K. et al. DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines. arXiv:[2310.03714](https://arxiv.org/abs/2310.03714) (2023).
+11. Yuan, W., Pang, R. Y., Cho, K., Sukhbaatar, S., Xu, J. & Weston, J. Self-Rewarding Language Models. arXiv:[2401.10020](https://arxiv.org/abs/2401.10020) (2024).
+12. Bai, Y. et al. Constitutional AI: Harmlessness from AI Feedback. arXiv:[2212.08073](https://arxiv.org/abs/2212.08073) (2022).
+13. Chen, T. Y., Kuo, F.-C., Liu, H., Poon, P.-L., Towey, D., Tse, T. H. & Zhou, Z. Q. Metamorphic Testing: A Review of Challenges and Opportunities. *ACM Computing Surveys* 51(1), 4:1–4:27. [doi:10.1145/3143561](https://doi.org/10.1145/3143561) (2018).
