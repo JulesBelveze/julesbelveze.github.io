@@ -8,20 +8,18 @@ mathjax: true
 
 Most work on self-evolving agents optimizes the update mechanism: how to search for better prompts, extract reusable skills, or consolidate memory. The evaluator those update rules depend on is usually inherited from a benchmark rather than built.
 
-That the evaluator matters is not news. "You can't optimize what you can't measure" is folk wisdom; the RLHF literature has said for years that the reward model, not the policy optimizer, is the bottleneck (Self-Rewarding Language Models opens on exactly this point, and RLAIF and Constitutional AI exist because the reward signal is the hard part). Test-driven development, regression testing, and CI gates encode the same ordering in software. So does every MLOps team that curates an eval set from production traces before touching a model.
+That the evaluator matters is not news. "You can't optimize what you can't measure" is folk wisdom; the RLHF literature has said for years that the reward model, not the policy optimizer, is the bottleneck. Test-driven development, regression testing, and CI gates encode the same ordering in software and so does every MLOps team that curates an eval set from production traces before touching a model.
 
 This post is not claiming that insight. What it adds is narrower:
 
 1. A **framing**: for the specific case of user-crafted agents on open-ended tasks, the evaluator is not inherited from anywhere, and naming it as a first-class, usually-unbuilt object clarifies why progress there is harder than the software-engineering results suggest.
 2. A **recipe**: a concrete way to bootstrap a per-agent regression gate from deployment history with minimal hand labeling, and an honest account of where that recipe stops.
 
-If you already gate every agent change on a curated eval, most of what follows will be familiar and the recipe is the only new part. That is the correct way to read this.
-
 To make this more than "measure before you optimize," here is the prediction the post stands or falls on: take a set of deployed open-ended agents, run an identical scaffold-optimization loop (say GEPA) against (a) a generic benchmark and (b) a per-agent gate built as described below, and hold out a human-labeled per-agent test set as ground truth. The prediction is that (b) produces fewer regressions on the held-out set per unit of measured improvement than (a). If it does not, the recipe adds nothing over the status quo and this post is wrong.
 
 ## Why the software-engineering wins don't transfer
 
-The strongest self-improving systems cluster in verifiable domains. Prompt optimizers like GEPA and OPRO search instructions against labeled benchmark examples. Agent Workflow Memory (AWM) mines reusable procedural templates from successful episodes and reports +51.1% relative success on WebArena. ExpeL distills natural-language rules from experience and reports double-digit relative gains over its base ReAct agent across HotpotQA, ALFWorld, and WebShop.
+The strongest self-improving systems cluster in verifiable domains. Prompt optimizers like [GEPA](https://arxiv.org/abs/2507.19457) and [OPRO](https://arxiv.org/abs/2309.03409) search instructions against labeled benchmark examples. [Agent Workflow Memory (AWM)](https://arxiv.org/abs/2409.07429) mines reusable procedural templates from successful episodes on WebArena. [ExpeL](https://arxiv.org/abs/2308.10144) distills natural-language rules from experience across HotpotQA, ALFWorld, and WebShop.
 
 The common thread is not the update rule. It is that each system inherited a free oracle: WebArena hands AWM a binary pass/fail, ALFWorld gives ExpeL a verified completion signal, GEPA scores against labeled examples. None of them had to build the evaluator. Formally, any self-improvement step is:
 
@@ -29,20 +27,20 @@ $$A_{t+1} = U\bigl(A_{1:t},\ E(\pi_{\theta_t,\Sigma_t}\ ;\ \Sigma_t,\ C_t)\bigr)
 
 $U$ is the update rule, the part the literature optimizes. $E$ is the evaluator that produces the signal $U$ consumes. In verifiable domains $E$ is a gift. For a user-crafted agent drafting strategy docs, synthesizing research, or coordinating a multi-step workflow, there is no benchmark, no oracle, no pass/fail at the end of a session. $E$ has to be built, per agent, and almost nobody builds it.
 
-What about the systems that do build their own evaluator? The recursive-self-improvement frontier is the real counterexample to "almost nobody builds $E$," and it is worth engaging with directly. ADAS searches over agent designs, Gödel Agent rewrites its own code, and the Darwin-Gödel Machine explicitly co-evolves agents against a performance signal. These systems do confront the evaluator problem head-on, but note which evaluator they build: each still optimizes against a benchmark score (SWE-bench, coding tasks, math) that supplies a verifiable oracle. They build a sophisticated search over $E$-scored candidates; they do not solve the case where no oracle exists to score against in the first place. So they sharpen the point rather than refute it: even the systems most serious about self-modification inherit their ground truth from a verifiable benchmark. The open-ended, per-user case is still unaddressed.
+What about the systems that do build their own evaluator? The recursive-self-improvement frontier is the real counterexample to "almost nobody builds $E$," and it is worth engaging with directly. [ADAS](https://arxiv.org/abs/2408.08435) searches over agent designs, [Gödel Agent](https://arxiv.org/abs/2410.04444) rewrites its own code, and the [Darwin-Gödel Machine](https://arxiv.org/abs/2505.22954) explicitly co-evolves agents against a performance signal. These systems do confront the evaluator problem head-on, but note which evaluator they build: each still optimizes against a benchmark score (SWE-bench, coding tasks, math) that supplies a verifiable oracle. They build a sophisticated search over $E$-scored candidates; they do not solve the case where no oracle exists to score against in the first place. So they sharpen the point rather than refute it: even the systems most serious about self-modification inherit their ground truth from a verifiable benchmark. The open-ended, per-user case is still unaddressed.
 
 ## Why the obvious substitute fails
 
 Open-ended completion is only partly observable. A session that ends with no follow-up could mean a perfect answer or a user who gave up. Outputs are non-deterministic across identical requests, and UI/web environments drift between runs: buttons move, login flows grow a step, pages vanish. By the time an evaluator runs, it may be grading a world that no longer exists. (Hold onto that last point; it comes back to bite our own proposal.)
 
-LLM-as-judge is the obvious substitute, and the evidence on it should make you cautious, with an important caveat about where that evidence comes from. The most striking numbers we have seen (heuristic detectors beating LLM judges by roughly 5:1 on structural failure detection; a context-neglect case where judges scored near zero while an entity-coverage heuristic hit F1 = 0.978) come from a vendor blog post promoting a commercial detection tool, run on Patronus AI's TRAIL benchmark (roughly 148 real agent traces, 841 annotated errors, 20+ failure categories). It is not independent peer-reviewed work and it is a tempting statistic to over-quote. Read it accordingly: it is suggestive, and it is exactly the kind of result a vendor would surface selectively. TRAIL's own headline finding, that even the best LLM judge scores around 11% on the full task, points the same direction.
+LLM-as-judge is the obvious substitute, and the evidence on it should make you cautious, with an important caveat about where that evidence comes from. The most striking numbers we have seen (cheap heuristic detectors beating LLM judges several-fold on structural failure detection) come from a vendor blog post promoting a commercial detection tool, run on Patronus AI's [TRAIL benchmark](https://arxiv.org/abs/2505.08638). It is not independent peer-reviewed work and it is a tempting statistic to over-quote. Read it accordingly: it is suggestive, and it is exactly the kind of result a vendor would surface selectively. TRAIL's own headline finding, that even the best LLM judge scores around 11% on the full task, points the same direction.
 
 The finding also cuts two ways. If a cheap deterministic heuristic beats a judge on structural failures, that argues against building an elaborate learned evaluator for those cases; just run the heuristic. The finding we actually want to lean on is narrower and better supported: judges are weakest exactly where they are asked to make holistic, semantic calls, which is most of open-ended evaluation, and they do not degrade gracefully.
 
 Two failure modes are more load-bearing than any single benchmark result:
 
 - **Correlated errors.** When the same model family generates and grades, blind spots are shared, and the judge waves through what the generator produced. This is well documented as self-preference bias.
-- **Goodhart under optimization.** The moment a judge becomes an optimization target, the agent learns to produce outputs that look right to the judge rather than are right. This is reward-model overoptimization (Gao, Schulman & Hilton quantify the gold-score decay as you optimize the proxy). The judge does not hold steady as the loop runs; it gets worse, because the optimizer is actively working against it.
+- **Goodhart under optimization.** The moment a judge becomes an optimization target, the agent learns to produce outputs that look right to the judge rather than are right. This is reward-model overoptimization ([Gao, Schulman & Hilton](https://arxiv.org/abs/2210.10760) quantify the gold-score decay as you optimize the proxy). The judge does not hold steady as the loop runs; it gets worse, because the optimizer is actively working against it.
 
 ## Building the evaluator first
 
@@ -75,7 +73,7 @@ There is also a privacy surface worth naming. The gate is built from user intera
 
 ## What a reliable gate unlocks, and what it doesn't
 
-With a trustworthy per-agent regression gate, the $U$ mechanisms the literature already built become safer to run: GEPA, OPRO, and DSPy can search against the per-agent set instead of a generic benchmark, and skill refinement and memory consolidation get a regression check before anything ships.
+With a trustworthy per-agent regression gate, the $U$ mechanisms the literature already built become safer to run: GEPA, OPRO, and [DSPy](https://arxiv.org/abs/2310.03714) can search against the per-agent set instead of a generic benchmark, and skill refinement and memory consolidation get a regression check before anything ships.
 
 One caution: optimizing $U$ against a fixed golden set is textbook Goodhart. Run GEPA against the same set long enough and it overfits the set rather than the user. The mitigation is to hold out a rotating, critic-refreshed partition that $U$ never sees, and to monitor the divergence between the gated score and the held-out score; when they separate, the optimizer is gaming the gate. A gate is a regression guardrail; it is not, on its own, a hill worth climbing.
 
@@ -101,4 +99,20 @@ The self-evolving-agent literature has produced strong $U$ mechanisms on top of 
 
 The defensible advice, stripped of everything unproven: validate your signal before you optimize against it, mine failures as carefully as successes, and never co-train the judge and the policy in the same model family. If you are building self-improving agents in production and have gone at the evaluator differently, we would like to compare notes.
 
-*Further reading: Self-Rewarding Language Models · Constitutional AI / RLAIF · Scaling Laws for Reward Model Overoptimization (Gao, Schulman & Hilton) · TRAIL benchmark (Patronus AI) · Metamorphic testing literature · ADAS · Gödel Agent · Darwin-Gödel Machine · GEPA · AWM · ExpeL*
+## References
+
+| # | Reference |
+|---|-----------|
+| [1] | Agrawal, L. A. et al. GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning. arXiv:[2507.19457](https://arxiv.org/abs/2507.19457) (2025). |
+| [2] | Yang, C., Wang, X., Lu, Y., Liu, H., Le, Q. V., Zhou, D. & Chen, X. Large Language Models as Optimizers (OPRO). arXiv:[2309.03409](https://arxiv.org/abs/2309.03409) (2023). |
+| [3] | Wang, Z., Mao, J., Fried, D. & Neubig, G. Agent Workflow Memory. arXiv:[2409.07429](https://arxiv.org/abs/2409.07429) (2024). |
+| [4] | Zhao, A., Huang, D., Xu, Q., Lin, M., Liu, Y.-J. & Huang, G. ExpeL: LLM Agents Are Experiential Learners. AAAI. arXiv:[2308.10144](https://arxiv.org/abs/2308.10144) (2024). |
+| [5] | Hu, S., Lu, C. & Clune, J. Automated Design of Agentic Systems (ADAS). arXiv:[2408.08435](https://arxiv.org/abs/2408.08435) (2024). |
+| [6] | Yin, X., Wang, X., Pan, L., Lin, L., Wan, X. & Wang, W. Y. Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement. ACL. arXiv:[2410.04444](https://arxiv.org/abs/2410.04444) (2024). |
+| [7] | Zhang, J., Hu, S., Lu, C., Lange, R. & Clune, J. Darwin Gödel Machine: Open-Ended Evolution of Self-Improving Agents. arXiv:[2505.22954](https://arxiv.org/abs/2505.22954) (2025). |
+| [8] | Deshpande, D., Gangal, V., Mehta, H., Krishnan, J., Kannappan, A. & Qian, R. TRAIL: Trace Reasoning and Agentic Issue Localization. arXiv:[2505.08638](https://arxiv.org/abs/2505.08638) (2025). |
+| [9] | Gao, L., Schulman, J. & Hilton, J. Scaling Laws for Reward Model Overoptimization. arXiv:[2210.10760](https://arxiv.org/abs/2210.10760) (2022). |
+| [10] | Khattab, O., Singhvi, A., Maheshwari, P., Zhang, Z., Santhanam, K. et al. DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines. arXiv:[2310.03714](https://arxiv.org/abs/2310.03714) (2023). |
+| [11] | Yuan, W., Pang, R. Y., Cho, K., Sukhbaatar, S., Xu, J. & Weston, J. Self-Rewarding Language Models. arXiv:[2401.10020](https://arxiv.org/abs/2401.10020) (2024). |
+| [12] | Bai, Y. et al. Constitutional AI: Harmlessness from AI Feedback. arXiv:[2212.08073](https://arxiv.org/abs/2212.08073) (2022). |
+| [13] | Chen, T. Y., Kuo, F.-C., Liu, H., Poon, P.-L., Towey, D., Tse, T. H. & Zhou, Z. Q. Metamorphic Testing: A Review of Challenges and Opportunities. *ACM Computing Surveys* 51(1), 4:1–4:27. [doi:10.1145/3143561](https://doi.org/10.1145/3143561) (2018). |
