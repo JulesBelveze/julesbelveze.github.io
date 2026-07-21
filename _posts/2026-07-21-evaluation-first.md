@@ -101,7 +101,7 @@ The defensible advice, stripped of everything unproven: validate your signal bef
 
 ## References
 
-| # | Reference |
+|  |  |
 |---|-----------|
 | [1] | Agrawal, L. A. et al. GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning. arXiv:[2507.19457](https://arxiv.org/abs/2507.19457) (2025). |
 | [2] | Yang, C., Wang, X., Lu, Y., Liu, H., Le, Q. V., Zhou, D. & Chen, X. Large Language Models as Optimizers (OPRO). arXiv:[2309.03409](https://arxiv.org/abs/2309.03409) (2023). |
