@@ -11,9 +11,9 @@ title: ""
   </h1>
 
   <div class="home-hero__copy">
-    <p>I work at <a href="https://hcompany.ai/">H</a> on Computer Use Agents and especially how to evaluate them in production settings.</p>
+    <p>I currently work at <a href="https://hcompany.ai/">H</a> as a researcher on Self-Evolving Computer Use Agents and more broadly how to evaluate CUAs in production settings.</p>
 
-    <p>I previously worked at <a href="https://dust.tt">Dust</a>, where I built product infrastructure and community. Earlier, I worked on anomaly detection at Microsoft and multilingual NLP at <a href="https://hypefactors.com/">Hypefactors</a>, including systems serving about a billion inferences a day.</p>
+    <p>I was previously at <a href="https://dust.tt">Dust</a>, operating as a software engineer on all things agentic and building a community. Earlier, my research focus was on anomaly detection at Microsoft and how to scale multilingual NLP (back when it was cool) at <a href="https://hypefactors.com/">Hypefactors</a>.</p>
   </div>
 
   <div class="home-hero__actions">
