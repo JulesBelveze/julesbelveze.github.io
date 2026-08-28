@@ -31,12 +31,17 @@ Put those two together and the honest version of this section isn't "harnesses n
 A year ago, an agent's full state was just weights plus one fixed harness object, $A_t = (\theta_t, \Sigma_t)$, where $\theta_t$ is the model's weights and $\Sigma_t$ is everything around it (prompts, tools, memory, and control logic a person wrote once and left alone). What's happening now is that $\Sigma_t$ is splitting into four parts that each move on their own:
 
 $$
+\Sigma_t := (\rho_t, M_t, T_t, g_t)
+$$
+
+where
+
+$$
 \begin{aligned}
-\Sigma_t := (\rho_t,\ M_t,\ T_t,\ g_t), \qquad \text{where} \quad
-& \rho_t = \text{the prompt} \\
-& M_t = \text{memory} \\
-& T_t = \text{the tool set} \\
-& g_t = \text{control logic (routing, retries, when to stop)}
+\rho_t &:= \text{prompt},\\
+M_t &:= \text{memory},\\
+T_t &:= \text{tool set},\\
+g_t &:= \text{control logic}.
 \end{aligned}
 $$
 
