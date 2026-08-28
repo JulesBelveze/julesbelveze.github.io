@@ -54,11 +54,11 @@ That decomposition matters for one reason: once $\Sigma_t$ is a product of mutab
 Given that, the interesting question isn't just whether an edit is good, it's that an edit lands on one of four separable pieces while whatever judges it has to weigh what happens to all four together. So it's worth separating proposing an edit from promoting it, and being specific about what each step actually sees. Three things are doing distinct work here: $U$ proposes a candidate edit, $E$ evaluates it, and $G$ decides whether it gets promoted.
 
 $$
-\tilde{\Sigma}_{t+1} = U(A_{1:t},\ \tau_{1:t}) \qquad \Sigma_{t+1} = G\Big(\Sigma_t,\ \tilde{\Sigma}_{t+1},\ E\big(\pi_{\theta_t}
+\tilde{\Sigma}_{t+1} = U(A_{1:t},\ \tau_{1:t})
 $$
 
 $$
-(\Sigma_t, \cdot),\ \pi_{\theta_t}(\tilde{\Sigma}_{t+1}, \cdot);\ \mathcal{X}\big)\Big)
+\Sigma_{t+1} = G\Big(\Sigma_t,\ \tilde{\Sigma}_{t+1},\ E\big(\pi_{\theta_t} \ (\Sigma_t, \cdot),\ \pi_{\theta_t}(\tilde{\Sigma}_{t+1}, \cdot);\ \mathcal{X}\big)\Big)
 $$
 
 $U$ proposes a candidate edit from the trajectory history $\tau_{1:t}$, the running log of past sessions, not a single snapshot. $E$ is the evaluator: it doesn't score the candidate in isolation, it compares parent and candidate side by side under matched conditions, and it returns whether the triggering capability improved, whether anything the parent already handled got worse, and what it cost. $G$ is the gate: it only lets the candidate replace the parent once a minimum improvement on the triggering capability is met, no regression shows up on the anchor tasks, and the cost stays under budget. The key thing is that this isn't just "the one case that prompted the edit looks better."
