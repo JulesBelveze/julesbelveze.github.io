@@ -1,5 +1,4 @@
-<footer class="page__footer">
-  <div class="wrapper">
+<div class="wrapper">
     {% assign gh = site.social.github | default: '' | strip %}
     {% assign x = site.social.x | default: '' | strip %}
     {% assign li = site.social.linkedin | default: '' | strip %}
@@ -37,6 +36,8 @@
       {% endif %}
     </ul>
 
+  <div>
+    <p class="footer__descriptor">Research engineer working on AI agents.</p>
     <p class="copyright">© {{ site.time | date: '%Y' }} {{ site.title }}</p>
   </div>
-</footer>
+</div>

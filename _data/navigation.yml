@@ -1,7 +1,5 @@
 main:
-  - title: "Home"
-    url: /
-  - title: "Blog"
+  - title: "Work"
+    url: /#selected-work
+  - title: "Writing"
     url: /blog/
-  - title: "Resources"
-    url: /resources/

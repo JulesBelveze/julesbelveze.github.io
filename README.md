@@ -30,7 +30,7 @@ script/check  # Production build plus internal HTML checks
 - Posts without `link` are published on `/blog/`. A post with `link` opens the external article instead.
 - Use `title` and `tags` on every post. Add `excerpt` when the automatic excerpt is not suitable.
 - The site defaults posts and pages to `layout: single`. Set `toc: true`, `classes: wide`, or `author_profile: false` in front matter when needed.
-- Navigation is in `_data/navigation.yml`. Optional home-page links belong in `_data/links.yml`.
+- Navigation is in `_data/navigation.yml`.
 
 ## Configuration and deployment
 

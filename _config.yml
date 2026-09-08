@@ -1,6 +1,6 @@
 # Site settings
 title: Jules Belveze
-description: "Thoughts, notes, and links."
+description: "Research engineer working on AI agents, evaluation, and machine learning systems."
 lang: en
 locale: en
 
@@ -50,6 +50,8 @@ defaults:
     values:
       layout: single
       author_profile: false
+      read_time: true
+      show_date: true
   - scope:
       path: ""
       type: "pages"

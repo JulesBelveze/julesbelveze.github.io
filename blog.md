@@ -1,21 +1,30 @@
 ---
 layout: single
-title: Blog
+title: Writing
 permalink: /blog/
+classes: wide
 ---
 
-<p class="page-intro">Notes on machine learning systems, model efficiency, and the engineering work around them.</p>
+<p class="page-intro">Research notes and engineering write-ups on agents, evaluation, model efficiency, and machine-learning systems.</p>
 
-<ul class="post-list">
-{% assign has_posts = false %}
+<div class="tag-filter">
+  <button class="tag-chip is-active" type="button" data-tag="all" aria-pressed="true">All</button>
+  {% for pair in site.tags %}
+    {% assign name = pair[0] %}
+    <button class="tag-chip" type="button" data-tag="{{ name | escape }}" aria-pressed="false">{{ name }}</button>
+  {% endfor %}
+</div>
+
+<p id="filter-status" class="sr-only" aria-live="polite"></p>
+
+<ul id="filter-posts" class="post-list writing-list">
 {% for post in site.posts %}
-  {% unless post.link %}
-    {% assign has_posts = true %}
-    {% include post-card.html post=post %}
-  {% endunless %}
+  {% if forloop.index <= 2 %}
+    {% include post-card.html post=post filterable=true %}
+  {% else %}
+    {% include post-card.html post=post filterable=true compact=true %}
+  {% endif %}
 {% endfor %}
-
-{% unless has_posts %}
-  <li>No internal posts yet. Check back soon.</li>
-{% endunless %}
 </ul>
+
+<script src="{{ '/assets/js/filter.js' | relative_url }}"></script>
