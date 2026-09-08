@@ -17,55 +17,30 @@ classes: wide
     </div>
 
     <div class="home-hero__actions">
-      <a class="button button--primary" href="#selected-work">See selected work</a>
-      <a class="button button--secondary" href="{{ '/blog/' | relative_url }}">Read the writing</a>
+      <a class="button button--primary" href="#writing">Read the writing</a>
     </div>
   </div>
 
-  <a class="home-hero__visual" href="{{ '/harnesses-becoming-state/' | relative_url }}" aria-label="Read Harnesses Are Becoming State">
-    <img src="{{ '/assets/images/harnesses-becoming-state-cover.png' | relative_url }}" alt="Diagram showing an editable agent harness connected to prompts, memory, skills, and control flow" width="2752" height="1536" fetchpriority="high">
-  </a>
 </section>
 
-<section class="home-section" id="selected-work">
-  <p class="eyebrow">Selected work</p>
-  <h2>From research questions to production systems.</h2>
+<section class="home-section" id="writing" aria-labelledby="writing-title">
+  <h2 id="writing-title">Writing</h2>
 
-  <ul class="selected-work">
-    <li>
-      <p class="selected-work__label">Agents · Evaluation</p>
-      <div>
-        <h3>Evaluation gates for self-evolving agents</h3>
-        <p>A research direction for testing mutable prompts, memory, skills, and control flow before promotion.</p>
-      </div>
-      <a href="{{ '/harnesses-becoming-state/' | relative_url }}">Read the research note <span aria-hidden="true">→</span></a>
-    </li>
-    <li>
-      <p class="selected-work__label">Inference · Scale</p>
-      <div>
-        <h3>Billions of daily NLP inferences</h3>
-        <p>Engineering work on scaling PyTorch inference with ONNX Runtime in Microsoft production systems.</p>
-      </div>
-      <a href="https://cloudblogs.microsoft.com/opensource/2022/04/19/scaling-up-pytorch-inference-serving-billions-of-daily-nlp-inferences-with-onnx-runtime/" target="_blank" rel="noopener">Read the case study <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
-    </li>
-    <li>
-      <p class="selected-work__label">MLOps · NLP</p>
-      <div>
-        <h3>Media intelligence with Metaflow</h3>
-        <p>A production case study on reliable machine-learning workflows for multilingual media intelligence.</p>
-      </div>
-      <a href="https://outerbounds.com/blog/mlops-media-intelligence/" target="_blank" rel="noopener">Read the case study <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
-    </li>
-  </ul>
-</section>
+  <div class="tag-filter">
+    <button class="tag-chip is-active" type="button" data-tag="all" aria-pressed="true">All</button>
+    {% for pair in site.tags %}
+      {% assign name = pair[0] %}
+      <button class="tag-chip" type="button" data-tag="{{ name | escape }}" aria-pressed="false">{{ name }}</button>
+    {% endfor %}
+  </div>
 
-<section class="home-section" aria-labelledby="latest-writing">
-  <p class="eyebrow">Writing</p>
-  <h2 id="latest-writing">Latest notes</h2>
+  <p id="filter-status" class="sr-only" aria-live="polite"></p>
 
-  <ul class="post-list post-list--compact">
-  {% for post in site.posts limit:3 %}
-    {% include post-card.html post=post compact=true heading_level=3 %}
+  <ul id="filter-posts" class="post-list post-list--compact">
+  {% for post in site.posts %}
+    {% include post-card.html post=post compact=true filterable=true heading_level=3 %}
   {% endfor %}
   </ul>
 </section>
+
+<script src="{{ '/assets/js/filter.js' | relative_url }}"></script>

@@ -180,8 +180,7 @@ h6,
   align-items: center;
   border-bottom: 1px solid var(--cafe-divider);
   display: grid;
-  gap: var(--cafe-space-48);
-  grid-template-columns: minmax(0, 1.1fr) minmax(18rem, .9fr);
+  grid-template-columns: minmax(0, 1fr);
   margin-bottom: var(--cafe-space-48);
   padding: clamp(3rem, 9vw, 7rem) 0 var(--cafe-space-48);
 }
@@ -217,25 +216,6 @@ h6,
 
 .home-title__logo + span {
   min-width: 0;
-}
-
-.home-hero__visual {
-  border: 1px solid var(--cafe-border);
-  border-radius: var(--cafe-radius);
-  display: block;
-  overflow: hidden;
-  transition: border-color 160ms ease, transform 160ms ease;
-}
-
-.home-hero__visual:hover {
-  border-color: var(--cafe-primary);
-  transform: translateY(-2px);
-}
-
-.home-hero__visual img {
-  display: block;
-  height: auto;
-  width: 100%;
 }
 
 .home-hero__copy {
@@ -300,55 +280,6 @@ h6,
   font-size: clamp(1.75rem, 3vw, 2.75rem);
   margin: 0 0 var(--cafe-space-24);
   padding-bottom: 0;
-}
-
-.selected-work {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.selected-work li {
-  align-items: center;
-  border-top: 1px solid var(--cafe-border);
-  display: grid;
-  gap: var(--cafe-space-24);
-  grid-template-columns: 10rem minmax(0, 1fr) auto;
-  max-width: none;
-  padding: var(--cafe-space-24) 0;
-}
-
-.selected-work li:last-child {
-  border-bottom: 1px solid var(--cafe-border);
-}
-
-.selected-work__label {
-  color: var(--cafe-primary);
-  font-family: "DM Mono", monospace;
-  font-size: .75rem;
-  font-weight: 700;
-  letter-spacing: .08em;
-  margin: 0;
-  text-transform: uppercase;
-}
-
-.selected-work h3 {
-  font-family: "Poppins", sans-serif;
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: -.02em;
-  margin: 0 0 var(--cafe-space-8);
-}
-
-.selected-work p:not(.selected-work__label) {
-  color: var(--cafe-muted);
-  margin: 0;
-}
-
-.selected-work a {
-  font-size: .875rem;
-  font-weight: 700;
-  white-space: nowrap;
 }
 
 .compute-receipt {
@@ -498,6 +429,10 @@ h6,
   flex-wrap: wrap;
   gap: var(--cafe-space-8);
   margin: 0 0 var(--cafe-space-24);
+}
+
+#filter-posts [hidden] {
+  display: none;
 }
 
 .tag-chip {
@@ -657,14 +592,9 @@ h6,
     grid-template-columns: 1fr;
   }
 
-  .selected-work li,
   .post-card--compact {
     gap: var(--cafe-space-8);
     grid-template-columns: 1fr;
-  }
-
-  .selected-work a {
-    white-space: normal;
   }
 
   .writing-list {

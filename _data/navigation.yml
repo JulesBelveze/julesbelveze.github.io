@@ -1,5 +1,3 @@
 main:
-  - title: "Work"
-    url: /#selected-work
   - title: "Writing"
-    url: /blog/
+    url: /#writing
