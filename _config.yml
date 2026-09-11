@@ -49,6 +49,7 @@ defaults:
       type: "posts"
     values:
       layout: single
+      classes: post-content
       author_profile: false
       read_time: true
       show_date: true
