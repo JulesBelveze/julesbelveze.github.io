@@ -23,7 +23,7 @@ So I measured both sides myself: a dataset of my own, Modal GPUs, the 4B model r
 and the original Jev through TypeSafe's API. One thing to get out of the way first: a model trained on
 in-domain labels *should* beat a zero-shot one. What I wanted to know was what whether small models are still a thing 
 in 2026, and how many labels it needs before it pays off. 
-The answers: a 30 macro-F1 point lead over the best decision model, for about 100 labels, an hour of annotation. 
+The answers: a 29 macro-F1 point lead over the best decision model, for about 100 labels, an hour of annotation. 
 However, an check on AG News showed me where the decision models genuinely shine.
 
 ## A Taxonomy of My Own
@@ -54,6 +54,7 @@ and my class descriptions. All numbers below share the same seed-42 stratified s
 | DistilBERT-base | fine-tuned | 67M | 0.739 | 5.4 | **3.6** |
 | FastBERT | early-exit | 251M | 0.732 | 11.8 | 8.4 |
 | TheseusBERT | compression | 151M | 0.709 | 4.6 | **3.6** |
+| Clef | zero-shot decision model | 27B | 0.419 | 341.2 ⁴ | n/a ⁴ |
 | Tev1-4B | zero-shot decision model | 5B ¹ | 0.410 | 418.9 | 123.4 |
 | Jev (API) | zero-shot decision model | undisclosed | 0.407 | n/a ² | n/a ² |
 | laya | zero-shot decision model | 421M | 0.381 | 59.9 | n/a ³ |
@@ -62,9 +63,12 @@ and my class descriptions. All numbers below share the same seed-42 stratified s
 ² Jev runs behind TypeSafe's API (p50 round trip ~250 ms); not comparable to local
 single-GPU numbers, so it sits out the latency and cost columns.
 ³ laya's `Router.predict` has no batch API, so it runs single-item.
+⁴ Clef (27B) doesn't fit the L4 used for the other rows; its latency is bs=1 on an H100,
+so it sits out the cost column.
 
 The gap is not subtle. The *worst* fine-tuned model here, TheseusBERT at 0.709, beats the
-*best* zero-shot decision model, Tev at 0.410, by 30 macro-F1 points while answering
+*best* zero-shot decision model, Cloudflare's 27B Clef at 0.419, by 29 macro-F1 points.
+Against Tev1-4B, the zero-shot model that fits the same L4 harness, it also answers
 34-91× faster. The original Jev, queried through TypeSafe's API with the same prompts,
 lands at 0.407, tied with its open clone. Batching helps everyone (encoder per-item latency drops 25-40%), but the
 ranking doesn't move, and Tev stays 13-34× slower even batched. FastBERT and TheseusBERT
@@ -102,7 +106,8 @@ improved it step by step:
    practical point stands, though. Unlike an LLM, you can't buy accuracy with exemplars.
    You use these models exactly as trained, or you fine-tune them.
 
-Their best, Tev at 0.42, still trails every fine-tuned model by roughly 30 points.
+The best zero-shot result, Clef at 0.419, still trails every fine-tuned model by
+roughly 29 points.
 
 ## The Calibration Test
 
@@ -116,6 +121,7 @@ reliability diagrams, with one-parameter temperature scaling for the encoders.
 | laya | 0.36 | **0.033** | 0.752 | 1.501 |
 | Tev1-4B | 0.41 | 0.327 | 0.860 | 1.969 |
 | Jev (API) | 0.40 | 0.472 | 1.028 | 6.910 |
+| Clef | 0.45 | 0.323 | 0.812 | 1.658 |
 
 <img src="{{ '/assets/images/small-specialized-reliability.png' | relative_url }}" alt="Reliability diagram: laya hugs the diagonal, Tev1-4B and the original Jev sit deep in the overconfident region" width="1322" height="1436" loading="lazy">
 
@@ -129,7 +135,11 @@ RoBERTa ties laya on ECE at twice the accuracy (Brier 0.33 vs 0.75).
 The original Jev is the sharpest version of this story. On AG News, where it is
 comfortable, its probabilities are honest (ECE 0.076). On my taxonomy it returns
 near-one-hot distributions while being wrong most of the time: ECE 0.472, NLL 6.9.
-Calibration, it turns out, is as in-distribution as accuracy.
+Calibration, it turns out, is as in-distribution as accuracy. Clef is the strongest
+witness: Cloudflare trains it with an explicit Brier objective, and in-distribution it
+shows, with the best calibration in this whole post (ECE 0.026 on AG News, better than
+the raw encoders). On my taxonomy that same model runs overconfident at ECE 0.323. Its
+reliability curve tracks Tev's, so I left it off the chart for legibility.
 
 Two caveats. Temperature scaling itself consumes the labeled validation set: cheap, but
 not zero labels. And at ~1.2k test items, ECE differences under ~0.02 sit inside binning
@@ -166,6 +176,7 @@ the benchmark's own.
 | DistilBERT · fine-tuned (full train) | **0.944** |
 | RoBERTa · fine-tuned (full train) | 0.944 |
 | laya · zero-shot | 0.929 |
+| Clef · zero-shot | 0.904 |
 | Tev1-4B · zero-shot | 0.896 |
 | Jev · zero-shot (API) | 0.884 |
 | DistilBERT · fine-tuned on 100 labels | 0.851 |
@@ -194,7 +205,7 @@ after one temperature parameter, calibration too.
 
 Even on tasks built for decision models, the small model holds up. 
 On AG News, fine-tuned DistilBERT beats Laya 0.944 to 0.929, with a fraction of the latency and cost. 
-And this is not just a quirk of the open clones: the original Jev scores 0.407 on my taxonomy and 0.884 on AG News. 
+And this is not just a quirk of the open clones: the original Jev scores 0.407 on my taxonomy and 0.884 on AG News, and Cloudflare's Clef, the biggest and best of them at 27B, follows the same curve at 0.419 and 0.904. 
 The same result shows up across price points. System-1 really is faster when the alternative is a frontier LLM. 
 Against a small fine-tuned encoder, though, the cost advantage disappears.
 
@@ -235,6 +246,9 @@ Runs on Modal (T4/L4/H100) - methodology:
 - The AG News check uses the official train/test splits, full test set (7,600 items,
   0 unparsed answers from any zero-shot model), and the same prompting protocol as the
   main runs.
+- **Clef** ran locally from its open weights (`Cloudflare/clef`, Apache 2.0) on an H100
+  via the bundled `joint_schema_model` code (torch 2.11, transformers 5.10), batch 16,
+  same prompts and class descriptions as every other run.
 - **Jev** was queried through TypeSafe's API (`jev-latest`, which resolved to
   `jev-1.13.0`), with the same class descriptions and body-only input as every other run,
   full test sets on both datasets, 0 unrecognized answers. Its probabilities come
@@ -249,7 +263,8 @@ Runs on Modal (T4/L4/H100) - methodology:
 - Tom's Hardware, [*TypeSafe AI's Jev offers an alternative to LLMs*][toms]
 - [*Fine-tuned small LLMs (still) significantly outperform zero-shot generative AI
   models in text classification*][ft]
-- [`JulesBelveze/tldr_news`][ds] · [AG News][ag] · [laya][laya] · [Tev1-4B][tev]
+- [`JulesBelveze/tldr_news`][ds] · [AG News][ag] · [laya][laya] · [Tev1-4B][tev] ·
+  [Clef][clef]
 - [bert-squeeze][bs], the compression library used for training, distillation, and the
   early-exit models · my [early-exiting series][ee]
 
@@ -263,3 +278,4 @@ Runs on Modal (T4/L4/H100) - methodology:
 [ee]: https://julesbelveze.github.io/early-exiting/
 [laya]: https://huggingface.co/convaiinnovations/laya
 [tev]: https://huggingface.co/togethercomputer/Tev1-4B-experimental
+[clef]: https://huggingface.co/Cloudflare/clef
