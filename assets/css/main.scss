@@ -168,6 +168,11 @@ h6,
   text-align: justify;
 }
 
+.page__content table {
+  display: table;
+  width: 100%;
+}
+
 .page__title {
   font-size: clamp(2.25rem, 5vw, 4rem);
   line-height: 1.08;
