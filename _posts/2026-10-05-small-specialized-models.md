@@ -7,8 +7,6 @@ last_modified_at: 2026-10-05
 
 <img src="{{ '/assets/images/small-specialized-cover.png' | relative_url }}" alt="100 labels beat the 5B decision model: fine-tuned encoder label-efficiency curves crossing the Tev1-4B zero-shot line" width="2400" height="1350" fetchpriority="high">
 
-*Every model on the same footing, across two datasets.*
-
 One hot idea of 2026 is the "System-1" decision model: a small, non-autoregressive model
 that classifies without generating text and returns calibrated probabilities in a single
 forward pass. TypeSafe AI's **Jev** introduced it with crazy numbers ([~193×
