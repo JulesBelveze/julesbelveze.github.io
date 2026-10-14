@@ -5,7 +5,7 @@ date: 2026-10-05
 last_modified_at: 2026-10-05
 ---
 
-<img src="{{ '/assets/images/small-specialized-cover.png' | relative_url }}" alt="100 labels beat the 5B decision model: fine-tuned encoder label-efficiency curves crossing the Tev1-4B zero-shot line" width="2400" height="1350" fetchpriority="high">
+<img src="{{ '/assets/images/small-specialized-cover.png' | relative_url }}" alt="100 labels beat the 27B decision model: fine-tuned encoder label-efficiency curves crossing the Clef-27B zero-shot line" width="2400" height="1350" fetchpriority="high">
 
 One hot idea of 2026 is the "System-1" decision model: a small, non-autoregressive model
 that classifies without generating text and returns calibrated probabilities in a single
@@ -54,7 +54,7 @@ and my class descriptions. All numbers below share the same seed-42 stratified s
 | DistilBERT-base | fine-tuned | 67M | 0.739 | 5.4 | **3.6** |
 | FastBERT | early-exit | 251M | 0.732 | 11.8 | 8.4 |
 | TheseusBERT | compression | 151M | 0.709 | 4.6 | **3.6** |
-| Clef | zero-shot decision model | 27B | 0.419 | 341.2 ⁴ | n/a ⁴ |
+| Clef | zero-shot decision model | 27B | 0.419 | 341.2 ⁴ | 102.5 ⁴ |
 | Tev1-4B | zero-shot decision model | 5B ¹ | 0.410 | 418.9 | 123.4 |
 | Jev (API) | zero-shot decision model | undisclosed | 0.407 | n/a ² | n/a ² |
 | laya | zero-shot decision model | 421M | 0.381 | 59.9 | n/a ³ |
@@ -63,8 +63,8 @@ and my class descriptions. All numbers below share the same seed-42 stratified s
 ² Jev runs behind TypeSafe's API (p50 round trip ~250 ms); not comparable to local
 single-GPU numbers, so it sits out the latency and cost columns.
 ³ laya's `Router.predict` has no batch API, so it runs single-item.
-⁴ Clef (27B) doesn't fit the L4 used for the other rows; its latency is bs=1 on an H100,
-so it sits out the cost column.
+⁴ Clef (27B) doesn't fit the L4 used for the other rows; its latency and cost come from
+an H100 at $0.001097 per GPU-second.
 
 The gap is not subtle. The *worst* fine-tuned model here, TheseusBERT at 0.709, beats the
 *best* zero-shot decision model, Cloudflare's 27B Clef at 0.419, by 29 macro-F1 points.
@@ -75,7 +75,8 @@ ranking doesn't move, and Tev stays 13-34× slower even batched. FastBERT and Th
 are the compression architectures from my [early-exiting series][ee], trained here with
 [bert-squeeze][bs].
 
-Latency converts directly into money. Batched on a Modal L4 at $0.000222 per GPU-second:
+Latency converts directly into money. Batched on a Modal L4 at $0.000222 per GPU-second
+(Clef on its H100):
 
 | Model | ~$ / 1M classifications |
 |---|---:|
@@ -85,6 +86,7 @@ Latency converts directly into money. Batched on a Modal L4 at $0.000222 per GPU
 | ModernBERT-base | ~$2.15 |
 | laya | ~$13 (single-item; a batch API would cut this substantially) |
 | Tev1-4B | ~$27 |
+| Clef | ~$113 (batched on an H100) |
 
 Plot accuracy against that cost:
 
@@ -123,7 +125,7 @@ reliability diagrams, with one-parameter temperature scaling for the encoders.
 | Jev (API) | 0.40 | 0.472 | 1.028 | 6.910 |
 | Clef | 0.45 | 0.323 | 0.812 | 1.658 |
 
-<img src="{{ '/assets/images/small-specialized-reliability.png' | relative_url }}" alt="Reliability diagram: laya hugs the diagonal, Tev1-4B and the original Jev sit deep in the overconfident region" width="1322" height="1436" loading="lazy">
+<img src="{{ '/assets/images/small-specialized-reliability.png' | relative_url }}" alt="Reliability diagram: laya hugs the diagonal; Tev1-4B, Clef and the original Jev sit deep in the overconfident region" width="1322" height="1436" loading="lazy">
 
 Giving them a fair comparison: laya honors its ECE claim. An expected calibration error of
 0.033 is genuinely good. But it's the calibration of a flat, underconfident distribution.
@@ -138,8 +140,8 @@ near-one-hot distributions while being wrong most of the time: ECE 0.472, NLL 6.
 Calibration, it turns out, is as in-distribution as accuracy. Clef is the strongest
 witness: Cloudflare trains it with an explicit Brier objective, and in-distribution it
 shows, with the best calibration in this whole post (ECE 0.026 on AG News, better than
-the raw encoders). On my taxonomy that same model runs overconfident at ECE 0.323. Its
-reliability curve tracks Tev's, so I left it off the chart for legibility.
+the raw encoders). On my taxonomy that same model runs overconfident at ECE 0.323, its
+reliability curve sitting right alongside Tev's in the chart above.
 
 Two caveats. Temperature scaling itself consumes the labeled validation set: cheap, but
 not zero labels. And at ~1.2k test items, ECE differences under ~0.02 sit inside binning
@@ -153,11 +155,11 @@ So let's price that convenience: fine-tune DistilBERT and RoBERTa on stratified
 subsamples of the training set, three seeds each, and see where they cross the zero-shot
 lines.
 
-<img src="{{ '/assets/images/small-specialized-label-efficiency.png' | relative_url }}" alt="Macro-F1 versus number of labeled training examples: DistilBERT crosses the Tev1-4B line at 100 labels, RoBERTa at 50" width="1726" height="1413" loading="lazy">
+<img src="{{ '/assets/images/small-specialized-label-efficiency.png' | relative_url }}" alt="Macro-F1 versus number of labeled training examples: DistilBERT crosses the best zero-shot line, Clef-27B, at 100 labels, RoBERTa at 50" width="1726" height="1413" loading="lazy">
 
-Twenty-five labels isn't enough. DistilBERT sits at 0.27, below both zero-shot models.
-Fifty ties laya, and RoBERTa already clears Tev on every seed there. At **one hundred
-labels, even DistilBERT beats Tev1-4B on every seed** (0.49 vs 0.41), and from there both
+Twenty-five labels isn't enough. DistilBERT sits at 0.27, below every zero-shot model.
+Fifty ties laya, and RoBERTa already noses past Tev and Clef on every seed there. At **one
+hundred labels, even DistilBERT beats the 27B Clef on every seed** (0.49 vs 0.42), and from there both
 curves just climb: RoBERTa hits 0.55 at 100, 0.66 at 1,000, and 0.78 on the full ~9,850.
 
 A hundred labeled examples is an hour of annotation. The training bill is a rounding
@@ -181,7 +183,7 @@ the benchmark's own.
 | Jev · zero-shot (API) | 0.884 |
 | DistilBERT · fine-tuned on 100 labels | 0.851 |
 
-<img src="{{ '/assets/images/small-specialized-dataset-gap.png' | relative_url }}" alt="Fine-tuned versus zero-shot gap per dataset: 37 points on tldr_news, 1.5 points on AG News" width="1616" height="1290" loading="lazy">
+<img src="{{ '/assets/images/small-specialized-dataset-gap.png' | relative_url }}" alt="Fine-tuned versus zero-shot gap per dataset: 36 points on tldr_news, 1.5 points on AG News" width="1616" height="1290" loading="lazy">
 
 This partially cuts against my headline, and I'm reporting it anyway: on a canonical
 benchmark taxonomy the zero-shot decision models are *good*. laya lands within 1.6 points
