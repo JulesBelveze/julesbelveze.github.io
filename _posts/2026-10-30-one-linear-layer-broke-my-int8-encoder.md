@@ -64,8 +64,8 @@ Quantizing the gate and up projections left every predicted class unchanged on
 my small diagnostic subset. Quantizing the down projections reproduced the
 failure.
 
-My first suspicion was the weights. I rounded the FFN weights to their INT8
-values, dequantized them, and ran the operations in FP32. That kept the
+I tested whether weight rounding alone could explain it. I rounded the FFN
+weights to their INT8 values, dequantized them, and ran the operations in FP32. That kept the
 weight-rounding error while taking the dynamic INT8 execution path out of the
 experiment. Quality stayed close to the reference.
 
@@ -120,7 +120,7 @@ which hadn't been used for the quantization diagnosis. The original checkpoint
 selection had used full validation, so this wasn't an untouched holdout.
 
 The result looked usable: macro-F1 stayed within about a point of FP32 across the
-batching and padding policies I checked. I could have stopped at that table.
+batching and padding policies I checked. I could have stopped at that score.
 
 **Then I compared the individual predictions.**
 
