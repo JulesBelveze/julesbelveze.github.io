@@ -128,7 +128,13 @@ async function main() {
     await inline.locator('#policy').selectOption('batch1_actual_length');
     await inline.locator('#previous').click();
     assert.equal(await inline.locator('#article').inputValue(), '66');
-    assert.ok(await inline.locator('html').evaluate(element => element.scrollHeight <= innerHeight + 2));
+    await page.waitForFunction(() => {
+      const frame = document.getElementById('ultrabert-predictions');
+      const main = frame.contentDocument?.querySelector('main');
+      return main && Math.abs(frame.getBoundingClientRect().height - main.getBoundingClientRect().height) <= 2;
+    });
+    const dimensions = await inline.locator('html').evaluate(element => ({ scrollHeight: element.scrollHeight, innerHeight, mainHeight: document.querySelector('main').getBoundingClientRect().height }));
+    assert.ok(dimensions.scrollHeight <= dimensions.innerHeight + 2, JSON.stringify(dimensions));
     await frameElement.screenshot({ animations: 'disabled', path: path.join(output, 'article-inline-phone.png') });
     await page.getByRole('link', { name: 'Open the full explorer →', exact: true }).click();
     await page.waitForSelector('#scores .score-row');
