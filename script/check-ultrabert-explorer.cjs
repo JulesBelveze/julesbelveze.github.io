@@ -1,10 +1,26 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { pathToFileURL } = require('node:url');
+const http = require('node:http');
 const { chromium } = require('playwright');
 
 async function main() {
+  const root = path.resolve('_site');
+  const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json' };
+  const server = http.createServer((request, response) => {
+    try {
+      const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
+      let file = path.resolve(root, '.' + pathname);
+      if (file !== root && !file.startsWith(root + path.sep)) throw new Error('Invalid path');
+      if (fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
+      response.setHeader('Content-Type', types[path.extname(file)] || 'application/octet-stream');
+      response.end(fs.readFileSync(file));
+    } catch {
+      response.writeHead(404); response.end('Not found');
+    }
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const origin = `http://127.0.0.1:${server.address().port}`;
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   const errors = [];
@@ -12,7 +28,7 @@ async function main() {
   const output = path.resolve('tmp/ultrabert-browser');
   fs.mkdirSync(output, { recursive: true });
   try {
-    await page.goto(pathToFileURL(path.resolve('_site/experiments/ultrabert-batching/index.html')).href);
+    await page.goto(origin + '/experiments/ultrabert-batching/');
     await page.waitForSelector('#scores .score-row');
     assert.equal(await page.locator('#article option').count(), 67);
     assert.equal(await page.locator('#article').inputValue(), '66');
@@ -50,9 +66,25 @@ async function main() {
     await page.keyboard.press('Enter');
     assert.notEqual(await page.locator('#article').inputValue(), before);
     assert.deepEqual(errors, []);
-    console.log('Explorer browser checks passed at desktop, tablet and phone widths.');
+    await page.setViewportSize({ width: 1280, height: 1000 });
+    await page.goto(origin + '/one-linear-layer-broke-my-int8-encoder/');
+    await page.getByRole('heading', { name: 'One Linear layer broke my INT8 encoder', exact: true }).waitFor();
+    await page.screenshot({ path: path.join(output, 'article-desktop.png') });
+    await page.locator('#the-rescue-still-changes-with-batching').evaluate(element => element.scrollIntoView({ block: 'start' }));
+    await page.screenshot({ path: path.join(output, 'article-interactive-preview.png') });
+    await page.getByRole('link', { name: 'Explore the predictions →', exact: true }).click();
+    await page.waitForSelector('#scores .score-row');
+    await page.getByRole('link', { name: '← Read the article', exact: true }).click();
+    await page.getByRole('heading', { name: 'One Linear layer broke my INT8 encoder', exact: true }).waitFor();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'Article horizontal overflow on phone');
+    await page.screenshot({ path: path.join(output, 'article-phone.png') });
+    assert.deepEqual(errors, []);
+    console.log('Explorer and article browser checks passed, including preview navigation and desktop/phone layouts.');
   } finally {
     await browser.close();
+    await new Promise(resolve => server.close(resolve));
   }
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });
