@@ -7,7 +7,22 @@
 @media(max-width:850px){.layout{grid-template-columns:1fr}.article{max-height:210px}.metric strong{font-size:21px}}
 @media(max-width:500px){main{padding:24px 14px}.card{padding:16px}.controls{gap:10px}.controls label{min-width:140px}.metrics{gap:6px}.metric{padding:10px}.metric strong{font-size:18px}.metric small{font-size:10px}.comparison-head{padding-left:0;gap:8px}.score-row{grid-template-columns:1fr 1fr;gap:6px}.score-name{grid-column:1 / -1;font-weight:600}.outcome{padding:9px}.outcome strong{font-size:14px}.navigation button{font-size:13px}}
 h1,h2,.eyebrow{font-family:"DM Mono",Menlo,Consolas,monospace}a{color:var(--alone);text-underline-offset:3px}
-</style></head><body><main><a href="/one-linear-layer-broke-my-int8-encoder/" style="color:#c43a00;font-size:13px;text-underline-offset:3px">← Read the article</a>
+
+/* The article supplies the introduction and aggregate results in embedded mode. */
+.embedded main{padding:12px 0;max-width:none}
+.embedded main>a,.embedded .eyebrow,.embedded h1,.embedded main>p.muted,.embedded .metrics,.embedded .verdict,.embedded details,.embedded footer,.embedded #identity{display:none}
+.embedded .controls{gap:8px;margin:0 0 10px}
+.embedded .controls label{min-width:125px;font-size:12px}
+.embedded select{padding:9px}
+.embedded .selection-note{font-size:11px;margin:0 0 12px}
+.embedded .layout{grid-template-columns:1fr;gap:12px}
+.embedded .card{padding:16px}
+.embedded .layout>.card:first-child>h2{display:none}
+.embedded .article{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;max-height:none;overflow:hidden;font-size:14px;margin-bottom:0}
+.embedded .navigation{margin:8px 0}
+.embedded .comparison-head{margin-top:12px}
+.embedded .score-note,.embedded .fp32-control{font-size:11px}
+</style><script>if(new URLSearchParams(location.search).get("embed")==="1")document.documentElement.classList.add("embedded");</script></head><body><main><a href="/one-linear-layer-broke-my-int8-encoder/" style="color:#c43a00;font-size:13px;text-underline-offset:3px">← Read the article</a>
 <div class="eyebrow">Recorded experiment · interactive walkthrough</div>
 <h1>Same article. Different batch. Different answer?</h1>
 <p class="muted">An aggregate score can stay close while individual decisions change. Compare the same article under two serving policies.</p>
@@ -120,4 +135,14 @@ function render(){
 $('filter').addEventListener('change',options);$('article').addEventListener('change',render);$('policy').addEventListener('change',render);$('model').addEventListener('change',render);
 for(const [id,step] of [['previous',-1],['next',1]])$(id).addEventListener('click',()=>{$('article').value=indices[(indices.indexOf(Number($('article').value))+step+indices.length)%indices.length];render();});
 options();
+if(document.documentElement.classList.contains('embedded')){
+ document.querySelector('.layout .card > p.muted').textContent='Summary excerpt · model input capped at 256 tokens. Open the full explorer for the complete text.';
+ const main=document.querySelector('main');
+ const reportHeight=()=>{
+  if(window.parent!==window&&location.origin!=='null')window.parent.postMessage({type:'ultrabert-explorer-height',height:Math.ceil(main.getBoundingClientRect().height)},location.origin);
+ };
+ new ResizeObserver(reportHeight).observe(main);
+ window.addEventListener('load',reportHeight);
+ reportHeight();
+}
 </script></main></body></html>

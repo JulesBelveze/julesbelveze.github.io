@@ -134,11 +134,15 @@ Here is the first changed example in validation order, a summary about GitHub
 Copilot. In a batch it reads as Headlines & News; alone it becomes Guides &
 Resources. Same summary, same checkpoint, same padding length.
 
-<a href="{{ '/experiments/ultrabert-batching/' | relative_url }}"><img src="{{ '/assets/images/ultrabert/batching-preview.png' | relative_url }}" alt="Two leading class scores for the same Copilot summary: batching favors Headlines and News, processing alone favors Guides and Resources." width="1600" height="900" loading="lazy"></a>
+<div class="prediction-explorer-inline">
+  <iframe id="ultrabert-predictions" class="prediction-explorer-frame" src="{{ '/experiments/ultrabert-batching/' | relative_url }}?embed=1" title="Compare the same article’s predictions in a batch and alone" loading="lazy" height="1100" hidden></iframe>
+  <noscript><img src="{{ '/assets/images/ultrabert/batching-preview.png' | relative_url }}" alt="The same Copilot summary changes predicted class when processed alone instead of in a batch." width="1600" height="900" loading="lazy"></noscript>
+</div>
+<script src="{{ '/assets/js/ultrabert-embed.js' | relative_url }}" defer></script>
 
-**[Explore the predictions →](/experiments/ultrabert-batching/)** Compare the
-policies side by side, including unchanged examples and the FP32 control. The
-bars show normalized model scores, not calibrated confidence.
+Try another article, switch the processing policy, or compare with FP32. The bars
+show normalized model scores, not calibrated confidence.
+[Open the full explorer →](/experiments/ultrabert-batching/)
 
 This doesn't prove that a particular batch companion caused the change. The
 experiment changes the batching policy, including the shape of the operation.
