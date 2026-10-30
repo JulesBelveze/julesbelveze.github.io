@@ -1,0 +1,34 @@
+# Preserving one down projection substantially rescues the INT8 recipe
+
+The completed run uses the same 64 stratified validation articles as both earlier investigations, with batch size 16, padding length 256, x86 dynamic INT8, and the same selected FP32 checkpoint. The investigator source hash matches the current script. Dataset hash, article order, and gold labels match the previous trace. The all-Linear control reproduces the earlier 31.33 macro-F1 result exactly.
+
+| Variant | Quantized Linear modules | Macro-F1, 0–100 | Predictions changed from FP32 |
+| --- | ---: | ---: | ---: |
+| FP32 reference | 0 | 81.08 | 0/64 |
+| All Linear modules INT8 | 169 | 31.33 | 32/64 |
+| Only the first down projection INT8 | 1 | 36.07 | 32/64 |
+| All Linear modules except the first down projection INT8 | 168 | 77.57 | 5/64 |
+
+The exact module is `ultrabert.layers.0.mlp.down_proj`. The recorded conversion lists confirm that this is the only difference between the 169-module and 168-module recipes. Every quantized variant starts independently from the same FP32 model; the exemption is not applied after quantization or after training a replacement.
+
+## What this establishes
+
+Dynamically quantizing this single projection is sufficient to severely degrade the checkpoint on the diagnostic subset. Preserving it while quantizing the remaining Linear modules recovers 46.25 macro-F1 points relative to indiscriminate conversion. The remaining gap to FP32 is 3.50 points, with five predictions changed, so this is a substantial but incomplete rescue.
+
+This is stronger evidence than the earlier separate observations about the first FFN block and the down-projection group. It directly tests their intersection and the corresponding exemption. It does not establish that this is the only numerically sensitive module, that all 32 changes in the two failing variants are the same examples, or that exempting it makes the model equivalent to FP32.
+
+The preceding weight-roundtrip control kept macro-F1 at 79.99 using rounded FFN weights with FP32 computation. Together, the experiments implicate the runtime quantization/kernel path in this particularly sensitive projection; they do not yet separate activation quantization from backend accumulation behavior or prove a specific activation-outlier mechanism.
+
+## What this does not establish
+
+The 64 validation articles have now guided repeated diagnostic choices. They cannot serve as an independent confirmation set for the recipe selected through those choices. Check the frozen exemption on the remaining 1,156 validation articles, and under the intended batch/padding policy, before claiming the rescue generalizes. The checkpoint itself was selected using full validation, so even that remainder is not an untouched model-selection holdout.
+
+No artifact size, save/reload equivalence, or latency was measured for the rescued recipe. Quantizing 168/169 Linear modules is a module count, not a fraction of all parameters or a measured compression ratio: embeddings and normalization remain FP32. Conversion-plus-validation elapsed times are not inference latency measurements. Existing original INT8 speed/size numbers must not be relabelled as results for this recipe.
+
+The earlier source taxonomy and URL-overlap limitations still apply to task-quality interpretation. No labels or splits have been changed, no new test inference has been performed, and no new training was launched for this analysis.
+
+## Blog claim supported now
+
+“Quantizing one Linear projection was enough to break our classifier on a fixed diagnostic subset. Keeping that projection in FP32, while quantizing the other 168 Linear modules, restored most of the lost macro-F1.”
+
+The post can show a concrete failure, systematic localization, and a targeted recovery. The next practical check is broader validation and serving measurements for this exact frozen exemption, rather than another architecture or training sweep.

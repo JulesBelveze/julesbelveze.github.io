@@ -33,6 +33,27 @@ jobs:
       - name: Check site
         run: script/check
 
+      - name: Set up Node for interactive checks
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install browser checker
+        run: |
+          npm install --prefix "$RUNNER_TEMP/browser-check" --no-package-lock --ignore-scripts playwright@1.56.1
+          "$RUNNER_TEMP/browser-check/node_modules/.bin/playwright" install --with-deps chromium
+
+      - name: Check interactive explorer
+        run: NODE_PATH="$RUNNER_TEMP/browser-check/node_modules" node script/check-ultrabert-explorer.cjs
+
+      - name: Save interactive previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ultrabert-browser-previews
+          path: tmp/ultrabert-browser/
+          if-no-files-found: ignore
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

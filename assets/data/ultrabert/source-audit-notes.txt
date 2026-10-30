@@ -1,0 +1,25 @@
+# Additional benchmark limitations
+
+The audit verified the pinned source parquet and frozen records against their recorded SHA256 values, then matched source text and mapped labels for all 12,205 retained records. It changes nothing in the benchmark.
+
+## Article URLs cross the split boundary
+
+There are 137 normalized source URLs present in more than one split. Seventy of the 1,221 test records (5.73%) link to a URL also found in training. These 70 test records form 89 train/test pairs because a URL can occur more than once in training. Forty-four of those pairs have different mapped labels. Across all cross-split URL groups, including validation, 71 contain more than one mapped label.
+
+A shared URL alone is not sufficient evidence of duplicate content: promotional homepages can support many different summaries. We therefore inspected the actual summaries as well:
+
+- A Grok 2.5 announcement appears in both train and test. The opening changes from “xAI open-sourced” to “xAI has open-sourced”; the rest is effectively identical. Both carry Headlines & News. Character sequence similarity is 98.9% under Python's SequenceMatcher, a descriptive measure rather than a semantic duplicate detector.
+- An OpenAI/AMD announcement differs mainly between “agreed to an agreement” and “agreed to a deal,” with 98.3% character similarity. Both carry Headlines & News. These are dataset texts, not claims independently fact-checked against the underlying news.
+- A Miro report promotion appears under Engineering & Research in the AI newsletter and Launches & Tools in the dev newsletter. The mapped labels are Research & Engineering in training and Headlines & News in test, despite 87.0% character similarity and the same source URL.
+
+Exact normalized text deduplication was insufficient to enforce article-level separation. Conflicting labels for the same source article can also reflect newsletter placement rather than an unambiguous topic. Neither observation quantifies the resulting score inflation or implies all 70 shared-URL test records are near-duplicates.
+
+Detailed pairs and provenance are in `overlap-examples.json` and `conflicting-url-examples.json`. These examples were ordered by character similarity; they illustrate the strongest observed overlap rather than a representative sample.
+
+## How to use this in the post
+
+Describe the current task as predicting a merged newsletter-section target. State that the random text-deduplicated split has residual source-article overlap. Keep existing scores as measurements under that frozen protocol; do not describe them as evidence of performance on unseen articles or future newsletters.
+
+The FFN diagnosis remains a numerical comparison between versions of the same checkpoint on the same validation inputs. This limitation narrows claims about classification generalization; it does not account for the numerical differences caused by quantizing that checkpoint.
+
+A future cleaner benchmark should define a domain-aware target and group records by article before splitting. It would require a new dataset version and fresh model comparisons. No such relabeling, split replacement, or retraining has been performed here.

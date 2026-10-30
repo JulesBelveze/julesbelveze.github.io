@@ -6,3 +6,6 @@ _site/
 vendor/
 .bundle/
 .idea/
+
+# Local browser-check output.
+tmp/

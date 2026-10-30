@@ -1,0 +1,68 @@
+# What the investigation established
+
+Source: `summary.json`, run `cpu-investigation-dc780077e3bf`. Original article metadata was checked against the pinned source parquet, SHA256 `50fcbcc76dca3fc6f5057c92f585657855805ef359321488d32f01fe41d0a17d`; article bodies matched the recorded source rows. See `example-source-metadata.json`.
+
+## FFN quantization is sufficient to reproduce the collapse
+
+These are macro-F1 scores on the same 64 stratified validation articles, with batch size 16 and fixed padding 256. They are not comparable numerically to the 1,221-example test scores as if they were the same split.
+
+| Quantized modules | Converted Linear modules | Macro-F1, 0–100 | Prediction agreement with FP32 |
+| --- | ---: | ---: | ---: |
+| None, FP32 reference | 0 | 81.08 | 100% |
+| All, per-tensor weights | 169 | 31.33 | 50.00% |
+| Attention only | 96 | 80.91 | 96.88% |
+| FFN only | 72 | 29.26 | 37.50% |
+| Classifier only | 1 | 81.08 | 100% |
+| Attention and FFN; classifier FP32 | 168 | 31.33 | 50.00% |
+| All, per-channel weights | 169 | 31.16 | 50.00% |
+| FFN only, per-channel weights | 72 | 20.49 | 39.06% |
+
+Attention-only quantization changes two of 64 predictions and stays near the FP32 score on this subset. Quantizing only the FFN group causes severe degradation even when attention and the classifier remain FP32. Keeping the classifier FP32 does not rescue the all-backbone recipe. Per-channel weight quantization does not rescue either tested scope.
+
+This isolates a sensitive module group under the x86 dynamic INT8 recipe. It does not identify a specific layer, distinguish activation from weight error, prove outliers caused the error, or establish that every FFN projection is sensitive. A plausible next hypothesis concerns quantization error around the gated MLP; that remains a hypothesis. The MLP computes down_proj(activation(gate_proj(x)) * up_proj(x)), so a follow-up should distinguish gate/up/down projections before making a more specific claim.
+
+No speed or deployment-size measurement was made for attention-only quantization. The recorded elapsed seconds include conversion and validation inference; they are not latency benchmarks. Do not call attention-only a deployment winner yet.
+
+## The original INT8 artifact nearly abandons three classes
+
+On the existing 1,221-example test evaluation, the INT8 artifact predicts Guides & Resources 610 times and Headlines & News 555 times: 1,165/1,221 predictions, or 95.4%, land in those two classes. The remaining three classes receive only 56 predictions combined.
+
+- Business & Strategy: 21/221 correct under INT8, versus 167/221 in FP32.
+- Research & Engineering: 9/145 correct, versus 105/145.
+- Security: 4/57 correct, versus 49/57.
+
+This is a broad prediction-distribution collapse, not merely a handful of borderline mistakes. The validation ablations locate sensitivity in the FFN group; they do not establish exactly how that numerical error creates the class bias.
+
+## Concrete examples, including regressions
+
+The investigation selected the first three hashes in each predefined category. The examples below are an editorial subset of that deterministic selection. They illustrate behavior; they do not establish its prevalence or the causal effect of teacher supervision on an individual prediction.
+
+| Article, source row | Frozen label | UltraBERT FP32 | Ettin baseline | Ettin distilled | Interpretation |
+| --- | --- | --- | --- | --- | --- |
+| Kubernetes v1.33: In-Place Pod Resize Graduated to Beta, 11598 | Headlines & News | Headlines & News | Guides & Resources | Headlines & News | The distilled checkpoint gets a release announcement right where the baseline predicts a guide. |
+| APIs Versioning: Best practices…, 11829 | Guides & Resources | Guides & Resources | Business & Strategy | Business & Strategy | A practical API guide remains wrong in both smaller checkpoints; the teacher's advantage is not fully transferred. |
+| Your All-in-one AI Music Studio, 8275 | Headlines & News | Guides & Resources | Headlines & News | Guides & Resources | The distilled model agrees with a wrong teacher label, while the baseline matches the frozen label. This is consistent with teacher-aligned regression, not proof that this example's error was copied during training. |
+| The Volkswagen logo…, 5781 | Headlines & News | Headlines & News | Headlines & News | Business & Strategy | Distillation also regresses where the teacher is correct, so teacher mistakes alone cannot explain all regressions. |
+| The IPO Door is Swinging Open, 14315 | Business & Strategy | Headlines & News | Headlines & News | Headlines & News | All FP32 models disagree with a label that reflects the newsletter's section placement. An IPO announcement can reasonably read as news. |
+
+Across the full test set: 143 articles are correct for the teacher and wrong for the baseline; distillation fixes 34 baseline errors and loses 27 baseline successes; all three FP32 models are wrong on 197 articles. Those categories overlap. The existing bootstrap interval for the distillation macro-F1 difference still includes zero.
+
+## Our label mapping needs a more precise description
+
+The frozen dataset uses original newsletter sections mapped into five shared names. Some section titles have different meanings across newsletter domains:
+
+- `Strategies & Tactics` maps to Business & Strategy. Among all retained articles with that source section, 564 are infosec, 438 marketing, and 331 founders articles.
+- `Opinions & Advice` maps to Business & Strategy; all 490 retained articles with that source section are from the dev newsletter.
+- `Deep Dives & Reports` maps to Research & Engineering; all 217 retained articles with that source section are fintech articles.
+
+The ReliaQuest malware article (source row 15855) is therefore labelled Business & Strategy because it came from infosec's Strategies & Tactics section. The original source is not labelled incorrectly by this observation; our cross-newsletter mapping gives it a misleading topic name.
+
+The Business & Strategy class contains 2,210 retained articles, including those 564 infosec and 490 dev articles. Research & Engineering contains 1,449 retained articles, including 217 fintech articles. Security contains 574 articles, all infosec, selected by the narrower Attacks & Vulnerabilities source section. This is not a clean five-topic classification benchmark.
+
+Do not claim the 197 shared mistakes are all annotation errors, estimate an accuracy ceiling from these examples, or silently relabel the test set. The comparisons remain measurements on one frozen operational target; they do not establish performance on a clean semantic taxonomy.
+
+## What this changes for the post
+
+The defensible engineering story is now: an indiscriminate INT8 conversion collapses the prediction distribution; validation ablations isolate the FFN group; a small FP32 baseline remains usable under the frozen target; individual examples expose both modest distillation gains and the limits of the target labels themselves.
+
+State the dataset mapping prominently. Keep the FFN result separate from unproven numerical explanations. If a revised mapping is pursued, version it and rerun the affected comparisons as a separate experiment rather than replacing these results. No further training was launched during this analysis.

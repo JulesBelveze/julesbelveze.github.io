@@ -1,0 +1,55 @@
+# Final verification: the exemption preserves most quality and reduces size and latency
+
+Run `cpu-final-verify-25817f615c66` completed. Coverage checks confirm exactly the 1,156 validation articles outside the 64-example diagnostic subset, with no test examples. The dataset checksum and exemption match the frozen protocol. Recorded source hashes match the current runner, evaluator, and diagnostic helper. Prediction class counts cover all 1,156 articles under each policy.
+
+The model checkpoint was selected using full validation, so this remainder is not an untouched model-selection holdout. It was excluded from the quantization ablations. No training or further exemption selection occurred in this run.
+
+## Quality across input policies
+
+| Policy | FP32 macro-F1, 0–100 | INT8 with first down projection FP32 | Difference, points |
+| --- | ---: | ---: | ---: |
+| Batch 16, padding 256 | 77.47 | 76.45 | −1.03 |
+| Batch one, padding 256 | 77.47 | 77.18 | −0.29 |
+| Batch one, actual length capped at 256 | 77.47 | 76.84 | −0.63 |
+
+The exemption is `ultrabert.layers.0.mlp.down_proj`. The other 168 Linear modules use dynamic INT8; embeddings and normalization remain FP32 as before. These results show that the diagnostic recovery extends to the validation remainder, with a modest observed quality cost. They do not establish statistical equivalence or generalization to other tasks/checkpoints.
+
+FP32 predictions remain identical across the three policies. The rescued INT8 model changes 67 predictions between batch 16 and batch one at fixed padding, and 73 between batch 16/fixed padding and batch one/actual length. These are disagreements with its own batch-16 predictions, not counts of additional errors and not a direct comparison between the two batch-one policies. This input-policy sensitivity must be reported; batching and padding are part of the effective inference configuration.
+
+## Deployment size
+
+| Artifact | Weight bytes | Total deployment bytes | Decimal deployment MB |
+| --- | ---: | ---: | ---: |
+| FP32 | 604,171,028 | 607,730,259 | 607.7 |
+| INT8 with exemption | 266,977,867 | 270,544,467 | 270.5 |
+
+The mixed-precision deployment artifact is 55.5% smaller, a 2.25-fold size reduction. This is serialized artifact size, not peak memory or resident-set size. Deployment bytes exclude Python cache files.
+
+## CPU latency
+
+The paired measurements below come from the same new CPU worker: two Torch threads, one interop thread, batch one, 32 seeded validation texts, three repeats, 20 warmup calls, and 96 samples per path. The CPU model is not exposed. Median actual input length is 67 tokens after truncation at 256.
+
+| Input policy | FP32 end-to-end p50, ms | Mixed-precision p50, ms | FP32 p95, ms | Mixed-precision p95, ms |
+| --- | ---: | ---: | ---: | ---: |
+| Padding 256 | 333.4 | 276.1 | 375.5 | 306.4 |
+| Actual length | 146.3 | 112.7 | 228.5 | 174.9 |
+
+End-to-end here means local tokenization plus forward pass, not HTTP serving. Under actual-length processing, median latency is 23.0% lower, a 1.30-fold speedup. With fixed padding it is 17.2% lower, a 1.21-fold speedup. Artifact compression is larger than the serving-speed gain. Do not mix these absolute timings with the original worker's measurements or infer a new comparison against Ettin, which was not timed on this worker.
+
+Removing fixed padding also benefits FP32 substantially: the median drops from 333.4 ms to 146.3 ms on this sample. The quantization comparison must use the same padding policy on both sides.
+
+The latency sample is smaller than the original study's 128 texts and does not establish production tail behavior, concurrency, throughput, or stability across CPU types. Report p95 as an empirical percentile of these samples, not an SLA.
+
+## Reload equivalence passed
+
+The artifact loader reconstructs the recorded module selection, including the FP32 exemption. Reloaded logits match pre-export logits under Torch's assert_close tolerances across all 1,156 articles at batch 16 with fixed padding. They also match on 32 probes under both batch-one policies. This verifies reload fidelity within each tested input policy; it does not imply the quantized model is invariant across input policies.
+
+## Final article framing
+
+The experiment now supports a complete engineering account: indiscriminate INT8 conversion failed, controlled ablations isolated a single sensitive projection, exempting it recovered most diagnostic quality, and the frozen exemption retained most quality on the validation remainder while reducing artifact size and latency.
+
+The practical result to lead with is 607.7 MB → 270.5 MB and 146.3 ms → 112.7 ms at batch one/actual length, with macro-F1 77.47 → 76.84 on the validation remainder. Keep the earlier test-based model comparison and this validation-based deployment check in separate tables.
+
+The numerical evidence implicates the dynamic quantization/kernel path beyond weight rounding. It still does not identify the exact activation or backend arithmetic mechanism. The merged newsletter taxonomy, source-URL overlap, one training seed, and hidden CPU model remain limitations. No new test score is claimed for the rescued recipe.
+
+No further compression sweeps or training are required for the planned post. The remaining work is editorial and packaging: write the reproducible example, finish the figures/article, and retain these scope boundaries when publishing.
