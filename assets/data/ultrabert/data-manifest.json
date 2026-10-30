@@ -1,0 +1,65 @@
+{
+  "dataset": "JulesBelveze/tldr_news",
+  "revision": "5ee6c613484aa6ac96fac7827a5659409897cc5b",
+  "source_sha256": "50fcbcc76dca3fc6f5057c92f585657855805ef359321488d32f01fe41d0a17d",
+  "records_sha256": "3b8444e7dc2709316e48d081869eedeef05503b8fc32344906b8e5bdfcb85e6e",
+  "labels": [
+    "Business & Strategy",
+    "Guides & Resources",
+    "Headlines & News",
+    "Research & Engineering",
+    "Security"
+  ],
+  "seed": 42,
+  "section_map": {
+    "Headlines & Launches": "Headlines & News",
+    "Headlines & Trends": "Headlines & News",
+    "News & Trends": "Headlines & News",
+    "Innovation & Launches": "Headlines & News",
+    "Launches & Products": "Headlines & News",
+    "Launches & Tools": "Headlines & News",
+    "Engineering & Research": "Research & Engineering",
+    "Research & Innovation": "Research & Engineering",
+    "Deep Dives & Analysis": "Research & Engineering",
+    "Deep Dives & Reports": "Research & Engineering",
+    "Articles & Tutorials": "Guides & Resources",
+    "Guides & Resources": "Guides & Resources",
+    "Resources & Tools": "Guides & Resources",
+    "Tools & Resources": "Guides & Resources",
+    "Opinions & Tutorials": "Guides & Resources",
+    "Attacks & Vulnerabilities": "Security",
+    "Markets & Business": "Business & Strategy",
+    "Strategies & Tactics": "Business & Strategy",
+    "Opinions & Advice": "Business & Strategy"
+  },
+  "normalization": "NFKC, casefold, collapse whitespace; used for dedup only",
+  "source_rows": 22132,
+  "excluded": {
+    "unmapped_section": 9820,
+    "duplicate_rows": 48,
+    "conflicting_label_rows": 59
+  },
+  "class_counts": {
+    "train": {
+      "Security": 459,
+      "Research & Engineering": 1159,
+      "Business & Strategy": 1768,
+      "Headlines & News": 3990,
+      "Guides & Resources": 2388
+    },
+    "validation": {
+      "Guides & Resources": 298,
+      "Headlines & News": 498,
+      "Research & Engineering": 145,
+      "Business & Strategy": 221,
+      "Security": 58
+    },
+    "test": {
+      "Business & Strategy": 221,
+      "Headlines & News": 499,
+      "Guides & Resources": 299,
+      "Security": 57,
+      "Research & Engineering": 145
+    }
+  }
+}

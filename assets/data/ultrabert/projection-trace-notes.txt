@@ -1,0 +1,67 @@
+# The failure is concentrated in down projections and the first FFN block
+
+The completed run contains all 31 planned interventions on the same 64 stratified validation articles, batch 16 and fixed padding 256. Its investigator source hash matches the local script. All 1,221 saved test prediction hashes match the frozen test split. These checks do not constitute a new held-out model comparison.
+
+## Weight rounding alone does not reproduce the collapse
+
+| Intervention | Validation macro-F1, 0–100 | Agreement with FP32 |
+| --- | ---: | ---: |
+| FP32 reference | 81.08 | 100% |
+| All FFN weights quantized then dequantized, FP32 computation | 79.99 | 98.44% |
+| Gate projections dynamically quantized | 81.08 | 100% |
+| Up projections dynamically quantized | 81.08 | 100% |
+| Gate + up dynamically quantized; all down projections FP32 | 81.08 | 100% |
+| Down projections dynamically quantized | 30.88 | 40.62% |
+| Up + down dynamically quantized | 20.40 | 40.62% |
+| Gate + down dynamically quantized | 19.13 | 35.94% |
+
+The FFN computes `down_proj(activation(gate_proj(x)) * up_proj(x))`. The down projection therefore receives the product of the gated branches. Dynamic quantization of all gate/up projections, while leaving every down projection FP32, changes no predictions on this subset. Dynamic quantization of down projections alone reproduces severe degradation.
+
+The roundtrip control uses the same per-tensor INT8 weights, dequantized into FP32 Linear operations, with FP32 activation computation. It changes one prediction. That makes weight rounding alone an inadequate explanation for the observed collapse. The remaining runtime quantization/kernel path contributes substantially under this recipe. This control does not separate activation quantization, accumulation effects, and backend-specific numerical behavior from each other.
+
+## The first block is unusually sensitive
+
+Quantizing only the first FFN block (layer index 0, all three projections) reduces macro-F1 from 81.08 to 36.07 and changes 32/64 predictions. For the other 23 blocks, tested one at a time, 21 change no predictions; layers 7 and 9 each change one. Their scores range from 79.99 to 81.08.
+
+These two intervention families establish separate results: the down-projection group is sufficient to cause severe degradation, and the first FFN block is sufficient to cause severe degradation. Their intersection, `ultrabert.layers.0.mlp.down_proj`, is the next precise target. It has NOT yet been quantized on its own, and the remaining fully quantized network has NOT yet been evaluated with only that module preserved in FP32. Do not claim that exempting a single Linear module fixes the model until that rescue intervention succeeds.
+
+## A large local error is not necessarily the most damaging error
+
+The isolated-module trace feeds each quantized operator exactly the input it receives on the FP32 trajectory. It measures errors on valid, unpadded positions, while retaining padding in the operator call. Its largest reported valid-token relative RMS error is in layer 14's up projection: 35.12% for dynamic INT8 versus 5.82% for rounded weights with FP32 computation. Yet quantizing all up projections leaves the 64 predictions unchanged.
+
+Several later down projections also have local errors around 28–35%. Quantizing their FFN blocks individually nevertheless leaves the final predictions unchanged. This shows why ranking isolated operator errors alone is insufficient: downstream computation and decision margins determine whether an intermediate perturbation changes a class prediction. Local numerical error and end-to-end task sensitivity answer different questions.
+
+The traces contain large activation max/RMS ratios, with extremes on both valid and padded positions. They support investigating range sensitivity, but they do not prove that outliers or padding caused the failure. The local report includes only the twelve highest-error modules; the full 72-module trace remains on the Modal volume.
+
+## Distillation shifts errors rather than uniformly improving predictions
+
+The existing test predictions show:
+
+- 34 baseline mistakes become correct; the teacher is correct on 25 of those and wrong on nine.
+- 27 baseline successes become wrong; 14 regressions match a wrong teacher prediction.
+- The teacher is correct on 12 regressions. One remaining regression has both student and teacher wrong but predicting different labels.
+
+This is consistent with some teacher-aligned regressions, but does not establish per-example causal copying. The 12 regressions with a correct teacher show that teacher mistakes alone cannot account for student regressions. The earlier paired bootstrap interval for the overall macro-F1 gain still includes zero.
+
+The net seven additional correct predictions are distributed unevenly across newsletter categories: AI +5, crypto +2, design −5, dev +2, devops +3, fintech −2, founders +2, infosec +2, marketing −3, product +1. These are descriptive counts from one checkpoint pair, not demonstrated domain-specific improvements.
+
+## URL overlap does not explain the main ranking
+
+Re-scoring existing predictions on the 1,151 test records whose canonical source URL does not occur in training gives:
+
+| Model | Macro-F1, 0–100 | Accuracy |
+| --- | ---: | ---: |
+| UltraBERT FP32 | 77.82 | 77.41% |
+| UltraBERT original INT8 | 28.42 | 44.48% |
+| Ettin baseline | 72.27 | 71.76% |
+| Ettin distilled | 73.23 | 72.55% |
+
+These are post-hoc descriptive subsets of the same test set, not independent validation. The ordering persists and the INT8 collapse remains. Excluding known URL overlap does not remove unknown near-duplicates or establish future-newsletter generalization.
+
+The 70 URL-overlap examples are harder on raw accuracy for the three FP32 checkpoints: teacher 48/70, baseline 46/70, distilled 44/70. This is not evidence that overlap hurts performance: the subsets differ in class mix, section placement, and label ambiguity. Their five-class macro-F1 additionally assigns zero to the absent Security class, so it should not be compared directly with the full-class subset as a causal overlap effect. The earlier observation of cross-split near-duplicates remains valid, but its existence is not proof that aggregate scores were inflated.
+
+## What is ready to claim
+
+For this checkpoint, backend, and validation subset, the broad all-Linear INT8 recipe fails; down-projection quantization and first-block FFN quantization separately reproduce the failure, while rounded weights with FP32 computation mostly preserve predictions. This is a useful debugging result, with a specific next rescue experiment.
+
+A stronger claim—that preserving the first down projection yields a smaller, faster, accurate model—still requires the rescue intervention, a broader validation check under the intended batch/padding policy, and artifact size/latency measurements. No new paid run, test inference, or retraining was launched during this analysis.
