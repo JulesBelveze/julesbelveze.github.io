@@ -36,7 +36,7 @@ async function main() {
     assert.equal(await page.locator('#metric-tradeoff').textContent(), '+33 / −28');
     assert.equal(await page.locator('#left-winner').textContent(), 'Headlines & News');
     assert.equal(await page.locator('#right-winner').textContent(), 'Guides & Resources');
-    await page.screenshot({ path: path.join(output, 'desktop.png'), fullPage: true });
+    await page.screenshot({ animations: 'disabled', path: path.join(output, 'desktop.png'), fullPage: true });
     await page.selectOption('#policy', 'batch1_actual_length');
     assert.equal(await page.locator('#metric-f1').textContent(), '76.45 → 76.84');
     assert.equal(await page.locator('#metric-changes').textContent(), '73 / 1,156');
@@ -60,7 +60,7 @@ async function main() {
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `Horizontal overflow at ${width}px`);
       assert.equal(await page.locator('#scores .score-cell').count(), 10);
     }
-    await page.screenshot({ path: path.join(output, 'phone.png'), fullPage: true });
+    await page.screenshot({ animations: 'disabled', path: path.join(output, 'phone.png'), fullPage: true });
     // Confirm that keyboard users can reach a native input and navigate examples.
     await page.locator('#previous').focus();
     await page.keyboard.press('Enter');
@@ -69,17 +69,21 @@ async function main() {
     await page.setViewportSize({ width: 1280, height: 1000 });
     await page.goto(origin + '/one-linear-layer-broke-my-int8-encoder/');
     await page.getByRole('heading', { name: 'One Linear layer broke my INT8 encoder', exact: true }).waitFor();
-    await page.screenshot({ path: path.join(output, 'article-desktop.png') });
-    await page.locator('#the-rescue-still-changes-with-batching').evaluate(element => element.scrollIntoView({ block: 'start' }));
-    await page.screenshot({ path: path.join(output, 'article-interactive-preview.png') });
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForFunction(() => ['body', '.initial-content', '.page', '.page__content'].map(selector => document.querySelector(selector)).filter(Boolean).every(element => Number(getComputedStyle(element).opacity) > 0.99));
+    await page.screenshot({ animations: 'disabled', path: path.join(output, 'article-desktop.png') });
+    await page.locator('#the-rescue-still-changes-with-batching').evaluate(element => element.scrollIntoView({ block: 'start', behavior: 'instant' }));
+    await page.screenshot({ animations: 'disabled', path: path.join(output, 'article-interactive-preview.png') });
     await page.getByRole('link', { name: 'Explore the predictions →', exact: true }).click();
     await page.waitForSelector('#scores .score-row');
     await page.getByRole('link', { name: '← Read the article', exact: true }).click();
     await page.getByRole('heading', { name: 'One Linear layer broke my INT8 encoder', exact: true }).waitFor();
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForFunction(() => ['body', '.initial-content', '.page', '.page__content'].map(selector => document.querySelector(selector)).filter(Boolean).every(element => Number(getComputedStyle(element).opacity) > 0.99));
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'Article horizontal overflow on phone');
-    await page.screenshot({ path: path.join(output, 'article-phone.png') });
+    await page.screenshot({ animations: 'disabled', path: path.join(output, 'article-phone.png') });
     assert.deepEqual(errors, []);
     console.log('Explorer and article browser checks passed, including preview navigation and desktop/phone layouts.');
   } finally {
