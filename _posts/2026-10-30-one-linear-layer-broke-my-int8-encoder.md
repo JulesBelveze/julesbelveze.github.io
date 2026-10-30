@@ -4,6 +4,7 @@ date: 2026-10-30
 last_modified_at: 2026-10-30
 tags: [blog, nlp, quantization, deployment]
 permalink: /one-linear-layer-broke-my-int8-encoder/
+classes: ""
 excerpt: "One FP32 exemption recovered most of an INT8 classifier's lost quality. Then batching changed 67 individual decisions behind a similar aggregate score."
 header:
   teaser: /assets/images/ultrabert/batching-preview.png

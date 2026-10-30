@@ -83,6 +83,7 @@ async function main() {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'Article horizontal overflow on phone');
+    assert.notEqual(await page.locator('.page__content p').first().evaluate(element => getComputedStyle(element).textAlign), 'justify');
     await page.screenshot({ animations: 'disabled', path: path.join(output, 'article-phone.png') });
     assert.deepEqual(errors, []);
     console.log('Explorer and article browser checks passed, including preview navigation and desktop/phone layouts.');
