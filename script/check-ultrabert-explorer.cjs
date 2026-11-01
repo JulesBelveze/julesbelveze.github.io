@@ -104,6 +104,13 @@ async function main() {
     await inline.locator('#scores .score-row').first().waitFor();
     const desktopControls = await inline.locator('.controls select').evaluateAll(elements => elements.map(element => { const r = element.getBoundingClientRect(); return { top: r.top, width: r.width, height: r.height }; }));
     assert.equal(desktopControls.length, 3);
+    assert.ok(await inline.locator('.controls select').evaluateAll(elements => elements.every(element => {
+      const style = getComputedStyle(element);
+      const context = document.createElement('canvas').getContext('2d');
+      context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      const available = element.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      return [...element.options].every(option => context.measureText(option.textContent).width <= available);
+    })), 'Dropdown option labels must fit beside their arrows');
     assert.ok(desktopControls.every(rect => Math.abs(rect.top - desktopControls[0].top) < 1 && Math.abs(rect.width - desktopControls[0].width) < 1 && rect.height === 44));
     assert.equal(await inline.locator('#right-winner').textContent(), 'Guides & Resources');
     assert.ok(await inline.locator('h1').isHidden());

@@ -30,9 +30,9 @@ h1,h2,.eyebrow{font-family:"DM Mono",Menlo,Consolas,monospace}a{color:var(--alon
 <h1>Same article. Different batch. Different answer?</h1>
 <p class="muted">An aggregate score can stay close while individual decisions change. Compare the same article under two serving policies.</p>
 <div class="controls">
-<label>Right-hand comparison<select id="policy"><option value="batch1_pad256" selected>Alone · padded to 256</option><option value="batch1_actual_length">Alone · actual length (max 256)</option></select></label>
+<label>Right-hand comparison<select id="policy"><option value="batch1_pad256" selected>Alone · padded to 256</option><option value="batch1_actual_length">Alone · actual length</option></select></label>
 <label>Model scores<select id="model"><option value="int8">Rescued INT8</option><option value="fp32">FP32 reference</option></select></label>
-<label>Example set<select id="filter"><option value="changed">67 INT8 flips at fixed padding</option><option value="stable">1,089 unchanged at fixed padding</option><option value="all">All 1,156 articles</option></select></label>
+<label>Example set<select id="filter"><option value="changed">67 changed decisions</option><option value="stable">1,089 unchanged decisions</option><option value="all">All 1,156 articles</option></select></label>
 </div>
 <p class="selection-note">Example sets use the fixed-padding comparison. Changing the right-hand policy keeps your article selected.</p>
 <div class="metrics" aria-live="polite">
