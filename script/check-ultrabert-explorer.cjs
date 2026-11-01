@@ -102,6 +102,9 @@ async function main() {
     await frameElement.scrollIntoViewIfNeeded();
     const inline = page.frameLocator('#ultrabert-predictions');
     await inline.locator('#scores .score-row').first().waitFor();
+    const desktopControls = await inline.locator('.controls select').evaluateAll(elements => elements.map(element => { const r = element.getBoundingClientRect(); return { top: r.top, width: r.width, height: r.height }; }));
+    assert.equal(desktopControls.length, 3);
+    assert.ok(desktopControls.every(rect => Math.abs(rect.top - desktopControls[0].top) < 1 && Math.abs(rect.width - desktopControls[0].width) < 1 && rect.height === 44));
     assert.equal(await inline.locator('#right-winner').textContent(), 'Guides & Resources');
     assert.ok(await inline.locator('h1').isHidden());
     assert.ok(await inline.locator('.metrics').isHidden());
@@ -125,6 +128,8 @@ async function main() {
       return main && Math.abs(frame.getBoundingClientRect().height - main.getBoundingClientRect().height) <= 2;
     });
     assert.ok(await inline.locator('html').evaluate(element => element.scrollWidth <= innerWidth));
+    const phoneControls = await inline.locator('.controls select').evaluateAll(elements => elements.map(element => { const r = element.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, height: r.height }; }));
+    assert.ok(phoneControls.every((rect, i) => Math.abs(rect.left - phoneControls[0].left) < 1 && Math.abs(rect.right - phoneControls[0].right) < 1 && rect.height === 44 && (!i || rect.top > phoneControls[i - 1].bottom)));
     await inline.locator('#policy').selectOption('batch1_actual_length');
     await inline.locator('#previous').click();
     assert.equal(await inline.locator('#article').inputValue(), '66');
