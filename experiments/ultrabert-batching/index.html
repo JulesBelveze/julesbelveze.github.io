@@ -32,9 +32,9 @@ h1,h2,.eyebrow{font-family:"DM Mono",Menlo,Consolas,monospace}a{color:var(--alon
 <div class="controls">
 <label>Right-hand comparison<select id="policy"><option value="batch1_pad256" selected>Alone · padded to 256</option><option value="batch1_actual_length">Alone · actual length</option></select></label>
 <label>Model scores<select id="model"><option value="int8">Rescued INT8</option><option value="fp32">FP32 reference</option></select></label>
-<label>Example set<select id="filter"><option value="changed">67 changed decisions</option><option value="stable">1,089 unchanged decisions</option><option value="all">All 1,156 articles</option></select></label>
+<label>Example set<select id="filter"><option value="changed">Changed INT8 (67)</option><option value="stable">Unchanged INT8 (1,089)</option><option value="all">All 1,156 articles</option></select></label>
 </div>
-<p class="selection-note">Example sets use the fixed-padding comparison. Changing the right-hand policy keeps your article selected.</p>
+<p class="selection-note">Example sets refer to INT8 at fixed padding. Changing the right-hand policy keeps your article selected.</p>
 <div class="metrics" aria-live="polite">
 <div class="metric"><small>Macro-F1 · batch 16 → alone</small><strong id="metric-f1"></strong><small>Across all 1,156 articles · 0–100</small></div>
 <div class="metric"><small>Predicted class changes</small><strong id="metric-changes"></strong><small id="metric-rate"></small></div>
