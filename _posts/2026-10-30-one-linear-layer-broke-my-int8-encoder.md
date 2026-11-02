@@ -11,6 +11,8 @@ header:
 image: /assets/images/ultrabert/batching-preview.png
 ---
 
+{::options smart_quotes="apos,apos,ldquo,rdquo" /}
+
 My [last two posts][previous] made the case for fine-tuned encoders when the job is
 classification. The next obvious question is what happens once you have a model
 that works: can you make it smaller and faster on CPU without giving up much of
@@ -33,7 +35,7 @@ model a useful deployment candidate?** Finding a smaller artifact is easy enough
 I wanted to establish where its predictions broke, whether a targeted exception
 could help, and what remained different after the score looked healthy again.
 
-## Find a boundary worth investigating
+## Finding which model component breaks under INT8
 
 The task is newsletter-section classification: predict a section from an article
 summary. As in the previous posts, this is my dataset and my label mapping, which
@@ -65,7 +67,7 @@ rescue the converted backbone either. The FFNs were a useful boundary to
 investigate, because their quantization was sufficient to reproduce the problem
 without quantizing attention or the classifier.
 
-## Separate rounded weights from quantized execution
+## Testing weight rounding inside the FFN
 
 UltraBERT's FFN has two branches: one applies a SiLU activation to the gate
 projection, their outputs are multiplied element by element, and a down
@@ -108,7 +110,7 @@ this experiment doesn't distinguish activation quantization from backend
 arithmetic effects. It narrowed the question without answering the precise
 numerical cause.
 
-## The largest tensor error didn't identify the damaging layer
+## Comparing tensor error with prediction changes
 
 Another reasonable approach was to measure how much error each quantized FFN
 operator introduced and investigate the worst one first. To make that comparison
@@ -140,7 +142,7 @@ Their intersection was an obvious candidate, but it still needed a direct test:
 ultrabert.layers.0.mlp.down_proj
 ```
 
-## Test the suspected failure and its recovery
+## Recovering quality with one FP32 projection
 
 There were two useful experiments to run on that projection. Quantizing it on
 its own would test whether its conversion was sufficient to cause severe
@@ -163,7 +165,7 @@ it connected a localized change to both a failure and a corresponding recovery.
 It wasn't a complete recovery, and it didn't establish that this was the only
 sensitive operation, but it gave me a specific recipe to check more broadly.
 
-## The rescue still changes with batching
+## Checking whether batch size changes the predictions
 
 The small diagnostic subset had now guided several choices, so its recovered
 score couldn't also serve as independent confirmation of those choices. I
@@ -197,7 +199,7 @@ Copilot. In a batch it reads as Headlines & News; alone it becomes Guides &
 Resources. The summary, checkpoint and padding length are the same.
 
 <div class="prediction-explorer-inline">
-  <iframe id="ultrabert-predictions" class="prediction-explorer-frame" src="{{ '/experiments/ultrabert-batching/' | relative_url }}?embed=1" title="Compare the same article’s predictions in a batch and alone" loading="lazy" height="1100" hidden></iframe>
+  <iframe id="ultrabert-predictions" class="prediction-explorer-frame" src="{{ '/experiments/ultrabert-batching/' | relative_url }}?embed=1" title="Compare the same article's predictions in a batch and alone" loading="lazy" height="1100" hidden></iframe>
   <noscript><img src="{{ '/assets/images/ultrabert/batching-preview.png' | relative_url }}" alt="The same Copilot summary changes predicted class when processed alone instead of in a batch." width="1600" height="900" loading="lazy"></noscript>
 </div>
 <script src="{{ '/assets/js/ultrabert-embed.js' | relative_url }}" defer></script>
@@ -218,7 +220,7 @@ A save/reload check couldn't have answered that question. It verifies that the
 saved model reproduces its own behavior under a given policy, which is useful,
 but doesn't establish that the model behaves the same under another one.
 
-## Measure the saving under the same serving policy
+## Measuring the size and latency tradeoff
 
 After the failure investigation, I still needed to answer the original question:
 what did the exemption actually buy in size, latency and quality?
@@ -245,7 +247,7 @@ small Ettin baseline was much faster in the original comparison, at a quality
 cost. Whether that tradeoff is acceptable depends on the task, and compression
 should earn the extra moving parts it introduces.
 
-## The check I'd keep
+## What to check before deploying a quantized model
 
 The investigation started as a compression experiment, but the useful result was
 a way to judge the candidate that came out of it. The targeted interventions
