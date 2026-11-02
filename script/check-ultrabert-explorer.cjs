@@ -95,8 +95,11 @@ async function main() {
     await page.getByRole('heading', { name: 'One Linear layer broke my INT8 encoder', exact: true }).waitFor();
     await page.evaluate(() => document.fonts.ready);
     await page.waitForFunction(() => ['body', '.initial-content', '.page', '.page__content'].map(selector => document.querySelector(selector)).filter(Boolean).every(element => Number(getComputedStyle(element).opacity) > 0.99));
+    const articleText = await page.locator('.page__content').innerText();
+    assert.ok(!articleText.includes('\u2019'), 'Article apostrophes must stay straight after Markdown rendering');
+    assert.ok(!articleText.includes('{::options'), 'Kramdown options must not appear in the article');
     await page.screenshot({ animations: 'disabled', path: path.join(output, 'article-desktop.png') });
-    await page.locator('#the-rescue-still-changes-with-batching').evaluate(element => element.scrollIntoView({ block: 'start', behavior: 'instant' }));
+    await page.locator('#checking-whether-batch-size-changes-the-predictions').evaluate(element => element.scrollIntoView({ block: 'start', behavior: 'instant' }));
     await page.screenshot({ animations: 'disabled', path: path.join(output, 'article-interactive-preview.png') });
     const frameElement = page.locator('#ultrabert-predictions');
     await frameElement.scrollIntoViewIfNeeded();
