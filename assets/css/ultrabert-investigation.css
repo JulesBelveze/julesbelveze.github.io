@@ -1,0 +1,38 @@
+.investigation-map { margin: 32px 0; padding: 24px 0; border-top: 1px solid #d4d2ca; border-bottom: 1px solid #d4d2ca; color: #111; text-align: left; }
+  .investigation-map * { box-sizing: border-box; }
+  .investigation-map .map-title { margin: 0 0 12px; font: 500 clamp(23px, 4vw, 30px)/1.3 "DM Mono", monospace; letter-spacing: -.04em; }
+  .investigation-map .intro { color: #62625f; margin: 0 0 30px; font-size: 15px; line-height: 1.6; }
+  .investigation-map .map { margin: 0; padding: 0; list-style: none; counter-reset: experiment; }
+  .investigation-map .step { position: relative; counter-increment: experiment; padding: 0 0 24px 48px; }
+  .investigation-map .step::before { content: counter(experiment, decimal-leading-zero); position: absolute; left: 0; top: 2px; font: 14px/1.6 "DM Mono", monospace; color: #c43a00; }
+  .investigation-map .step:not(:last-child)::after { content: ""; position: absolute; width: 1px; background: #d4d2ca; left: 11px; top: 30px; bottom: 6px; }
+  .investigation-map .step-title { margin: 0 0 10px; font-size: 17px; line-height: 1.4; font-weight: 600; }
+  .investigation-map .result { margin: 0; font-size: 15px; line-height: 1.6; }
+  .investigation-map .muted { color: #62625f; }
+  .investigation-map .branches { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; position: relative; padding-bottom: 22px; }
+  .investigation-map .branch { border: 1px solid #d4d2ca; border-radius: 6px; padding: 16px; background: #fff; position: relative; }
+  .investigation-map .branch::after { content: ""; position: absolute; height: 14px; width: 1px; background: #c43a00; bottom: -15px; left: 50%; }
+  .investigation-map .branches::after { content: ""; position: absolute; left: calc(25% - 4px); right: calc(25% - 4px); bottom: 7px; height: 1px; background: #c43a00; }
+  .investigation-map .label { display: block; margin-bottom: 7px; font: 12px/1.4 "DM Mono", monospace; color: #62625f; }
+  .investigation-map .branch strong { display: block; margin-top: 8px; color: #c43a00; font-size: 15px; line-height: 1.5; font-weight: 600; }
+  .investigation-map .conclusion { position: relative; border-left: 3px solid #c43a00; background: #ece9e1; padding: 15px 18px; border-radius: 0 6px 6px 0; }
+  .investigation-map .conclusion::before { content: "↓"; display: block; position: absolute; top: -24px; left: calc(50% - 6px); color: #c43a00; }
+  .investigation-map code { font-family: "DM Mono", monospace; font-size: .9em; overflow-wrap: anywhere; }
+  .investigation-map .controls { margin: 18px 0 0; padding: 0 0 0 15px; border-left: 1px solid #d4d2ca; }
+  .investigation-map .controls p { margin: 7px 0 0; color: #62625f; font-size: 13px; line-height: 1.6; }
+  .investigation-map .controls strong { color: #111; font-weight: 500; }
+  .investigation-map .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .investigation-map .pair p { margin: 0; padding-left: 14px; border-left: 1px solid #d4d2ca; }
+  .investigation-map .pair strong { display: block; margin-bottom: 5px; font-size: 14px; }
+  .investigation-map figcaption { margin: 6px 0 0 48px; padding-top: 15px; border-top: 1px solid #d4d2ca; font-size: 12px; line-height: 1.6; color: #62625f; }
+@media (max-width: 540px) {
+  .investigation-map .step { padding-left: 34px; padding-bottom: 26px; }
+  .investigation-map .branches, .investigation-map .pair { grid-template-columns: 1fr; gap: 12px; }
+  .investigation-map .branches { padding-bottom: 20px; }
+  .investigation-map .branch { padding: 13px; }
+  .investigation-map .branch::after, .investigation-map .branches::after { display: none; }
+  .investigation-map .conclusion::before { content: "↓ both clues"; left: 0; top: -22px; font-size: 12px; }
+  .investigation-map figcaption { margin-left: 34px; }
+}
+.investigation-map figcaption { float: none; max-width: none; width: auto; text-align: left; }
+.investigation-map .map-title, .investigation-map .step-title { padding: 0; border: 0; }
