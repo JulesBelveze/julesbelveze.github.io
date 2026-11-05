@@ -98,6 +98,17 @@ async function main() {
     const articleText = await page.locator('.page__content').innerText();
     assert.ok(!articleText.includes('\u2019'), 'Article apostrophes must stay straight after Markdown rendering');
     assert.ok(!articleText.includes('{::options'), 'Kramdown options must not appear in the article');
+    const investigation = page.locator('.investigation-map');
+    assert.equal(await investigation.locator('.step').count(), 5);
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      assert.ok(await investigation.evaluate(element => element.scrollWidth <= element.clientWidth), 'Investigation map must fit the article');
+      const branches = await investigation.locator('.branch').evaluateAll(elements => elements.map(element => { const r = element.getBoundingClientRect(); return { left: r.left, top: r.top }; }));
+      assert.ok(width === 390 ? branches[1].top > branches[0].top : branches[1].left > branches[0].left, 'Investigation branches must stack on phones');
+      await investigation.screenshot({ animations: 'disabled', style: '.masthead { visibility: hidden !important; }', path: path.join(output, `article-map-${width}.png`) });
+    }
+    await page.setViewportSize({ width: 1280, height: 1000 });
+    await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
     await page.screenshot({ animations: 'disabled', path: path.join(output, 'article-desktop.png') });
     await page.locator('#checking-whether-batch-size-changes-the-predictions').evaluate(element => element.scrollIntoView({ block: 'start', behavior: 'instant' }));
     await page.screenshot({ animations: 'disabled', path: path.join(output, 'article-interactive-preview.png') });

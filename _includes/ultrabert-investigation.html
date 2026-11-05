@@ -1,0 +1,50 @@
+<link rel="stylesheet" href="{{ '/assets/css/ultrabert-investigation.css' | relative_url }}">
+<figure class="investigation-map" aria-label="Five stages of the quantization investigation">
+<h2 class="map-title">How I narrowed down the INT8 failure</h2>
+<p class="intro">Each test narrowed the next question. Two independent sets of interventions pointed to the same projection.</p>
+  <ol class="map">
+    <li class="step">
+      <h3 class="step-title">Rule out a broken export</h3>
+      <p class="result muted">Reloading reproduced the failed predictions. Changing batch size or padding didn't restore quality.</p>
+    </li>
+    <li class="step">
+      <h3 class="step-title">Find where quantization hurts</h3>
+      <div class="branches">
+        <div class="branch">
+          <span class="label">BY TYPE OF OPERATION</span>
+          <p class="result">Quantize attention, FFNs, then the FFN projections separately.</p>
+          <strong>The down projections reproduce the collapse.</strong>
+        </div>
+        <div class="branch">
+          <span class="label">BY POSITION IN THE NETWORK</span>
+          <p class="result">Quantize one whole FFN block at a time.</p>
+          <strong>The first FFN block is especially sensitive.</strong>
+        </div>
+      </div>
+      <div class="conclusion">
+        <p class="result">Test their intersection:<br><code>ultrabert.layers.0.mlp.down_proj</code></p>
+      </div>
+      <aside class="controls" aria-label="Additional diagnostic tests">
+        <span class="label">WHAT THE OTHER TESTS TOLD ME</span>
+        <p><strong>Rounded weights + FP32 computation:</strong> quality stays close to the reference. Weight rounding alone doesn't explain the collapse.</p>
+        <p><strong>Largest local tensor error:</strong> a later up projection, whose quantization leaves the diagnostic class predictions unchanged.</p>
+      </aside>
+    </li>
+    <li class="step">
+      <h3 class="step-title">Test the suspected projection directly</h3>
+      <div class="pair">
+        <p class="result muted"><strong>Quantize only this projection</strong>A large quality drop.</p>
+        <p class="result muted"><strong>Keep only this Linear projection FP32</strong>Most quality recovered with the other Linear modules INT8.</p>
+      </div>
+    </li>
+    <li class="step">
+      <h3 class="step-title">Freeze the exception and check more articles</h3>
+      <p class="result muted">On the remaining validation articles, aggregate quality stays close to FP32. Changing batching still changes individual INT8 decisions.</p>
+    </li>
+    <li class="step">
+      <h3 class="step-title">Measure the deployment tradeoff</h3>
+      <p class="result muted">A smaller artifact and lower median CPU latency under matched serving policies, with batching sensitivity still to assess.</p>
+    </li>
+  </ol>
+  <figcaption>Localization and recovery tests used 64 diagnostic articles. The remaining validation articles checked the frozen recipe; checkpoint selection had used full validation. The precise numerical cause remains unresolved.</figcaption>
+</figure>
