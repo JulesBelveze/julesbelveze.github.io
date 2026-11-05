@@ -105,7 +105,7 @@ async function main() {
       assert.ok(await investigation.evaluate(element => element.scrollWidth <= element.clientWidth), 'Investigation map must fit the article');
       const branches = await investigation.locator('.branch').evaluateAll(elements => elements.map(element => { const r = element.getBoundingClientRect(); return { left: r.left, top: r.top }; }));
       assert.ok(width === 390 ? branches[1].top > branches[0].top : branches[1].left > branches[0].left, 'Investigation branches must stack on phones');
-      await investigation.screenshot({ animations: 'disabled', path: path.join(output, `article-map-${width}.png`) });
+      await investigation.screenshot({ animations: 'disabled', style: '.masthead { visibility: hidden !important; }', path: path.join(output, `article-map-${width}.png`) });
     }
     await page.setViewportSize({ width: 1280, height: 1000 });
     await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));

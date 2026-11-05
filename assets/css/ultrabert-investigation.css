@@ -34,5 +34,5 @@
   .investigation-map .conclusion::before { content: "↓ both clues"; left: 0; top: -22px; font-size: 12px; }
   .investigation-map figcaption { margin-left: 34px; }
 }
-.investigation-map figcaption { float: none; max-width: none; width: auto; text-align: left; }
+.investigation-map figcaption { float: none; max-width: none; width: auto; text-align: left; font-family: inherit; }
 .investigation-map .map-title, .investigation-map .step-title { padding: 0; border: 0; }
