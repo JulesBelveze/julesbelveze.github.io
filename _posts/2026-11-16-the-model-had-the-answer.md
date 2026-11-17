@@ -1,10 +1,11 @@
 ---
-title: "The model had the answer. It couldn't stop thinking."
+title: "This model knows the answer. It just can't stop thinking."
 date: 2026-11-16
-last_modified_at: 2026-11-16
+last_modified_at: 2026-11-17
 tags: [blog, nlp, reasoning, evaluation, interpretability]
 permalink: /the-model-had-the-answer/
 classes: ""
+mathjax: true
 excerpt: "A 0.8B reasoning model scores 8% on MATH-500, and a lot of the time the right answer is sitting in its own scratchpad. It just never stops thinking. Two weeks ago an AI agent got it to 48% by editing its weights. I spent a few days on why it loops, and got to about 50% by ending the thinking for it."
 header:
   teaser: /assets/images/stop-button/teaser.png
@@ -15,19 +16,16 @@ image: /assets/images/stop-button/teaser.png
 
 This is Qwen3.5-0.8B, about 4,000 tokens on an algebra problem.
 
-```text
-* $45 + 2 = 47$.
-* $47 - 5 = 42$.
-* $42 + 5 = 47$.
-* Okay, I am confident in 47.
-
-* Wait, I should check if there is any hidden trick.
-* Maybe the expression is $a \star b = 9a + 2b - ab + 5$.
-* Wait, let me check if the term is $-ab$ or $+ab$.
-    [...]
-* Wait, let me check if the term is $-ab$ or $+ab$.
-* Wait, let me check if the term is $-ab$ or $+ab$.
-```
+> * $45 + 2 = 47$.
+> * $47 - 5 = 42$.
+> * $42 + 5 = 47$.
+> * Okay, I am confident in 47.
+> * Wait, I should check if there is any hidden trick.
+> * Maybe the expression is $a \star b = 9a + 2b - ab + 5$.
+> * Wait, let me check if the term is $-ab$ or $+ab$.
+> * \[...\]
+> * Wait, let me check if the term is $-ab$ or $+ab$.
+> * Wait, let me check if the term is $-ab$ or $+ab$.
 
 And then it writes that last line again and again. For 28,000 more tokens,
 until the budget runs out. Since it never gives an answer it actually gets marked wrong. Even though it
@@ -175,10 +173,8 @@ thirds of the time it uses up all 4,096 tokens and never gives a boxed answer.
 I went and read a few to see why, and it's kind of funny: it starts over. For example, on
 the 47 problem:
 
-```text
-To find the value of $5 \star 1$, we need to substitute the values $a = 5$
-and $b = 1$ into the given expression for the operation $\star$.
-```
+> To find the value of $5 \star 1$, we need to substitute the values $a = 5$
+> and $b = 1$ into the given expression for the operation $\star$.
 
 So closing the tag ends the thinking, but the model still doesn't commit to what
 it already found. And a fresh attempt can loop all over again.
