@@ -27,12 +27,11 @@ This is Qwen3.5-0.8B, about 4,000 tokens on an algebra problem.
 > * Wait, let me check if the term is $-ab$ or $+ab$.
 > * Wait, let me check if the term is $-ab$ or $+ab$.
 
-And then it writes that last line again and again. For 28,000 more tokens,
+Then it writes that last line for 28,000 more tokens,
 until the budget runs out. Since it never gives an answer it actually gets marked wrong. Even though it
 had 47 the whole time.
 
-Why care about one small model stuck on one algebra problem? Because of a
-result you may have seen two weeks ago. A group at MIT CSAIL published [Sparks of Weight-Space Programming][logs]. 
+This is the model from a result you may have seen two weeks ago. A group at MIT CSAIL published [Sparks of Weight-Space Programming][logs]. 
 They gave GPT-6 Astra direct access to this "little" model's weights and let it experiment for 50
 rounds. Astra ended up changing 131,072 weights (0.016% of the model),
 and MATH-500 accuracy jumped from 7.9% to 48.1%.
@@ -41,8 +40,8 @@ Spoiler alert: most of the 40 points between 7.9% and 48.1% are caused by a stop
 problem. The model often has its answer within a few thousand tokens and then
 can't end its own thinking. If you end it yourself and write the first few words
 of the answer for it, it scores 49.8%, without touching weights. That's about
-where the edit lands. The trick only works because every answer here goes in a
-"box", but we'll get to that.
+where the edit lands. It only works because every answer here goes in a
+"box".
 
 ![MATH-500 accuracy: base model 8.2; ending the thinking at 8k tokens 36.7; ending it and starting the answer 49.8; Astra's weight edit 51.8.](/assets/images/stop-button/ladder.svg)
 
@@ -50,7 +49,7 @@ where the edit lands. The trick only works because every answer here goes in a
 samples each). The last row is the authors' edited checkpoint, run through the
 same pipeline. I get 51.8% there, a bit above the 48.1% they report.*
 
-A bit of context if you haven't used these models. In thinking mode the
+In thinking mode the
 model writes a scratchpad first, then emits a special `</think>` token, then
 writes its answer. Only a final `\boxed{}` answer counts.
 
@@ -58,7 +57,7 @@ Astra's own report is pretty upfront about what the edit fixes. Of the 579
 samples it rescued on its practice problems, 576 had simply run out of budget
 before. So it's an edit that stops the model looping.
 
-One thing before going further. With thinking turned off the model already gets
+With thinking turned off the model already gets
 43 to 50%. People on [the audit thread][issue4] found that before I
 did. But then you have a thinking model you can't let
 think, and I wanted to understand why thinking mode breaks.
@@ -107,8 +106,8 @@ the 24 positions before the stop.
 
 ![Median logit gap between the top choice and the stop token over the 24 tokens before a natural stop: around 21 to 26 logits until two tokens before, 17.4 one token before, 1.4 at the stop.](/assets/images/stop-button/stop-cliff.svg)
 
-Honestly, I kinda expected a ramp. I thought the stop token would slowly get more
-likely as the reasoning wrapped up. That's not what happens at all. Every one of
+I kinda expected a ramp, with the stop token slowly getting more
+likely as the reasoning wrapped up. That's not what happens. Every one of
 the 147 stops comes right after a line break, and the line before it is nearly
 always the model telling itself it's finished. Stuff like "Okay, done
 thinking." or "Ready to write." In the middle of a line, stopping isn't even on
@@ -117,7 +116,7 @@ the start of an ordinary line the stop token is still about 15 behind (you'll
 see that one on the next chart). Right after one of those closing lines, it's
 1.4 behind - the cliff at the right edge of the chart.
 
-So then I got curious about what makes a line a closing one. I thought it'd be the
+I thought what makes a line a closing one would be the
 wording, but a line that says "done" or "ready" only makes the stop likely about
 one time in seven. It depends on where the line sits. In the first half of a
 trace almost no line opens a real chance to stop. Right at the end, about one in
@@ -127,15 +126,15 @@ I also wondered if this was just a quirk of this one small model, so I ran the
 same thing on Qwen3-1.7B. It finishes 94% of the time, and it has the same
 cliff, only sharper.
 
-Which brings me back to the 47 trace. I was sure "Okay, I am confident in 47."
+Back in the 47 trace, I was sure "Okay, I am confident in 47."
 was a missed chance to stop. So I checked, and I was wrong (again): right after
 that line the stop token is still 15.6 logits behind, same as any other line.
 The model wasn't close. Same story on the others: of 120 looping traces I looked
 at, 117 never had a single real chance to stop before the loop began.
 
-## Okay, but can't you just penalize repetition?
+## Why penalizing repetition doesn't work
 
-That was my next thought. Let's start with why it repeats in the first
+Penalizing repetition was the obvious thing to try next. But first, why it repeats in the first
 place. Astra's logs have a lead here. In layers 15 and 19 there's an attention
 head that looks back at the last time the current text showed up, and at what
 came right after it. Astra only flagged them as candidates, but you can see the
@@ -161,16 +160,16 @@ well, and they don't save it either.[^penalties]
 
 ## If it won't stop, stop it yourself
 
-At this point the model clearly isn't going to make the decision, so I made it
+The model clearly isn't going to stop by itself, so I ended the thinking
 for it. I came across *budget forcing*, from the [s1 paper][s1]. They
 describe it as appending the end-of-thinking token "and optionally 'Final
-Answer:'" once you hit a token budget. Turns out that on this model the
+Answer:'" once you hit a token budget. On this model the
 "optionally" part matters a lot.
 
 I tried the simple version first. Append `</think>` after 8,192 thinking tokens
 and give the model 4,096 tokens to answer. That gets 36.7%. Better, but two
 thirds of the time it uses up all 4,096 tokens and never gives a boxed answer.
-I went and read a few to see why, and it's kind of funny: it starts over. For example, on
+I read a few to see why: it starts over. For example, on
 the 47 problem:
 
 > To find the value of $5 \star 1$, we need to substitute the values $a = 5$
@@ -192,13 +191,13 @@ often.[^prefix] My guess at why it works is that after "The final answer is",
 the most likely thing to write is a value the model has already written several
 times. So the copying habit that causes the loop is probably what helps here.
 
-## Is it just guessing, though?
+## How much thinking it needs
 
-To check, I changed how much thinking the model gets before I force the answer.
+To check that the forced answer isn't just a guess, I changed how much thinking the model gets before I force it.
 
 ![Accuracy with a forced answer after 0, 256, 1k, 2k, 4k, 8k and 16k thinking tokens: 8.8, 9.8, 31.8, 41.5, 46.8, 49.8, 49.9. Astra's weight edit, for reference, is at 51.8.](/assets/images/stop-button/budget.svg)
 
-With zero thinking, forcing an answer gets 8.8%. So no, it can't just guess.
+With zero thinking, forcing an answer gets 8.8%. So it isn't guessing.
 Most of the accuracy shows up between 256 and 4,000 tokens, there are 3 more
 points by 8k, and then nothing. Which is right about where the loops start.
 
@@ -234,7 +233,7 @@ benchmark.
 
 ## So what did Astra's edit do?
 
-This is the cool part. The model's state at each position is a vector
+The model's state at each position is a vector
 of 1,024 numbers, and a *direction* is just a unit vector `u` in that space.
 Here `u` is whatever separates "the model is repeating itself" from "the model
 is making progress". The edit takes 64 neurons in each of two layers and makes
@@ -257,7 +256,7 @@ The edit doesn't make stopping more likely, by the way. Astra's logs show
 premature. As far as I can tell from the logs, it makes the repeated line less
 attractive, so the model keeps reasoning until it winds down by itself.
 
-I figured finding `u` must have eaten most of the 50 rounds. Nope, Astra had it
+I figured finding `u` must have eaten most of the 50 rounds, but Astra had it
 on round three. It wrote eight short texts, four pairs that share a problem and
 an opening. In each pair, one continues normally and the other repeats a
 sentence three times. `u` is the average state at the end of each text,
@@ -268,8 +267,7 @@ held-out problems.
 
 When I'd tried to find the direction myself, before reading how Astra did it, I
 got nowhere near. It took me a while to see why. I was reading at the output of
-the feed-forward block, and the place to read is the running state. My data was
-fine, I was looking in the wrong place.[^probe]
+the feed-forward block, and the place to read is the running state.[^probe]
 
 ## Takeaways
 
@@ -287,7 +285,7 @@ supposed to close. A flat 1.5 against 13.5 logits was never going to work.
 A thinking model stops once it has wound down and told itself it's done. This
 one doesn't get there on 92% of samples. What I still
 don't know is why. The 1.7B model gets there on almost every problem, so the
-winding down gets learned somewhere between the two, and I'd love to know where.
+winding down gets learned somewhere between the two.
 
 ---
 
